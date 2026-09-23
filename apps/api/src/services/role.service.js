@@ -35,7 +35,7 @@ class RoleServices {
     const role = await Prisma.role.create({
       data: {
         tenantId,
-        name: name.trim(),
+        name: name.trim().toUpperCase(),
         description: description?.trim() || null,
         isSystem: false,
       },
