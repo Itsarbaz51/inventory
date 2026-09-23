@@ -29,16 +29,6 @@ class HelperUtils {
 
         min: 4,
       },
-
-      PIN: {
-        defaultLength: 4,
-
-        charset: '0123456789',
-
-        required: ['0123456789'],
-
-        min: 1,
-      },
     };
 
     const config = configs[type];
