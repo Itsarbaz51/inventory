@@ -10,3 +10,7 @@ export { default as WarehouseValidationSchemas } from './warehouse.validation.js
 export { default as WarehouseStockValidationSchemas } from './warehouse-stock.validation.js';
 export { default as SupplierValidationSchemas } from './supplier.validation.js';
 export { default as PurchaseValidationSchemas } from './purchase.validation.js';
+export { default as PurchaseItemValidationSchemas } from './purchase-item.validation.js';
+export { default as PurchaseReturnValidationSchemas } from './purchaseReturn.validation.js';
+export { default as PurchaseReturnItemValidationSchemas } from './purchaseReturnItem.validation.js';
+export { default as CustomerValidationSchemas } from './customer.validation.js';

@@ -10,3 +10,7 @@ export { default as WarehouseController } from './warehouse.controller.js';
 export { default as WarehouseStockController } from './warehouse-stock.controller.js';
 export { default as SupplierController } from './supplier.controller.js';
 export { default as PurchaseController } from './purchase.controller.js';
+export { default as PurchaseItemController } from './purchase-item.controller.js';
+export { default as PurchaseReturnController } from './purchaseReturn.controller.js';
+export { default as PurchaseReturnItemController } from './purchaseReturnItem.controller.js';
+export { default as CustomerController } from './customer.controller.js';

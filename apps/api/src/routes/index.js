@@ -11,6 +11,9 @@ import productRoute from './product.route.js';
 import warehouseRoute from './warehouse.route.js';
 import warehouseStockRoute from './warehouse-stock.route.js';
 import purchaseRoute from './purchase.route.js';
+import purchaseItemRoutes from './purchase-item.route.js';
+import purchaseReturnItems from './purchaseReturnItem.route.js';
+import customerRoutes from './customer.route.js';
 
 const router = Router();
 
@@ -25,5 +28,9 @@ router.use('/products', productRoute);
 router.use('/warehouses', warehouseRoute);
 router.use('/warehouse-stocks', warehouseStockRoute);
 router.use('/purchases', purchaseRoute);
+router.use('/purchase-items', purchaseItemRoutes);
+router.use('/purchase-return-items', purchaseReturnItems);
+router.use('/customers', customerRoutes);
+
 
 export default router;
