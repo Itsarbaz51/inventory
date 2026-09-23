@@ -1,11 +1,11 @@
-import Redis from "ioredis";
-import { envConfig } from "./index.js";
+import Redis from 'ioredis';
+import { envConfig } from './index.js';
 
 export const redis = new Redis({
-    host: envConfig.REDIS_HOST,
-    port: Number(envConfig.REDIS_PORT),
+  host: envConfig.REDIS_HOST,
+  port: Number(envConfig.REDIS_PORT),
 
-    maxRetriesPerRequest: null,
+  maxRetriesPerRequest: null,
 
-    enableReadyCheck: false,
-}); F
+  enableReadyCheck: false,
+});

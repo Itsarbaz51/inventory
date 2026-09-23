@@ -32,7 +32,6 @@ class AuthMiddleware {
         throw ApiError.unauthorized('Invalid token payload');
       }
 
-      F;
       const user = await Prisma.user.findUnique({
         where: {
           id: decoded.id,

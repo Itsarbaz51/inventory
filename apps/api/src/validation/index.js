@@ -1,1 +1,1 @@
-export * from './auth.validation.js'
+export { default as AuthValidationSchemas } from './auth.validation.js';
