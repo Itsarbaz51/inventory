@@ -7,9 +7,7 @@ datasource db {
   provider = "mysql"
 }
 
-// =====================================================
 // ENUMS
-// =====================================================
 
 enum TenantStatus {
   ACTIVE
@@ -112,9 +110,7 @@ enum NotificationType {
   SYSTEM
 }
 
-// =====================================================
 // TENANT
-// =====================================================
 
 model Tenant {
   id           String @id @default(uuid()) @db.Char(36)
@@ -181,9 +177,7 @@ model Tenant {
   @@map("tenants")
 }
 
-// =====================================================
 // USERS
-// =====================================================
 
 model User {
   id         String @id @default(uuid()) @db.Char(36)
@@ -224,9 +218,7 @@ model User {
   @@map("users")
 }
 
-// =====================================================
 // ROLES
-// =====================================================
 
 model Role {
   id       String @id @default(uuid()) @db.Char(36)
@@ -250,9 +242,7 @@ model Role {
   @@map("roles")
 }
 
-// =====================================================
 // PERMISSIONS
-// =====================================================
 
 model Permission {
   id String @id @default(uuid()) @db.Char(36)
@@ -270,9 +260,7 @@ model Permission {
   @@map("permissions")
 }
 
-// =====================================================
 // ROLE PERMISSIONS
-// =====================================================
 
 model RolePermission {
   id String @id @default(uuid()) @db.Char(36)
@@ -289,9 +277,7 @@ model RolePermission {
   @@map("role_permissions")
 }
 
-// =====================================================
 // CATEGORIES
-// =====================================================
 
 model Category {
   id       String @id @default(uuid()) @db.Char(36)
@@ -320,9 +306,7 @@ model Category {
   @@map("categories")
 }
 
-// =====================================================
 // BRANDS
-// =====================================================
 
 model Brand {
   id       String @id @default(uuid()) @db.Char(36)
@@ -345,9 +329,7 @@ model Brand {
   @@map("brands")
 }
 
-// =====================================================
 // UNITS
-// =====================================================
 
 model Unit {
   id       String @id @default(uuid()) @db.Char(36)
@@ -370,9 +352,7 @@ model Unit {
   @@map("units")
 }
 
-// =====================================================
 // PRODUCTS
-// =====================================================
 
 model Product {
   id       String @id @default(uuid()) @db.Char(36)
@@ -429,9 +409,7 @@ model Product {
   @@map("products")
 }
 
-// =====================================================
 // WAREHOUSES
-// =====================================================
 
 model Warehouse {
   id       String @id @default(uuid()) @db.Char(36)
@@ -467,9 +445,7 @@ model Warehouse {
   @@map("warehouses")
 }
 
-// =====================================================
 // WAREHOUSE STOCK
-// =====================================================
 
 model WarehouseStock {
   id String @id @default(uuid()) @db.Char(36)
@@ -497,9 +473,7 @@ model WarehouseStock {
   @@map("warehouse_stock")
 }
 
-// =====================================================
 // SUPPLIERS
-// =====================================================
 
 model Supplier {
   id       String @id @default(uuid()) @db.Char(36)
@@ -540,9 +514,7 @@ model Supplier {
   @@map("suppliers")
 }
 
-// =====================================================
 // PURCHASES
-// =====================================================
 
 model Purchase {
   id String @id @default(uuid()) @db.Char(36)
@@ -596,9 +568,7 @@ model Purchase {
   @@map("purchases")
 }
 
-// =====================================================
 // PURCHASE ITEMS
-// =====================================================
 
 model PurchaseItem {
   id String @id @default(uuid()) @db.Char(36)
@@ -626,9 +596,7 @@ model PurchaseItem {
   @@map("purchase_items")
 }
 
-// =====================================================
 // PURCHASE RETURNS
-// =====================================================
 
 model PurchaseReturn {
   id String @id @default(uuid()) @db.Char(36)
@@ -670,9 +638,7 @@ model PurchaseReturn {
   @@map("purchase_returns")
 }
 
-// =====================================================
 // PURCHASE RETURN ITEMS
-// =====================================================
 
 model PurchaseReturnItem {
   id String @id @default(uuid()) @db.Char(36)
@@ -693,9 +659,7 @@ model PurchaseReturnItem {
   @@map("purchase_return_items")
 }
 
-// =====================================================
 // CUSTOMERS
-// =====================================================
 
 model Customer {
   id       String @id @default(uuid()) @db.Char(36)
@@ -737,9 +701,7 @@ model Customer {
   @@map("customers")
 }
 
-// =====================================================
 // SALES
-// =====================================================
 
 model Sale {
   id String @id @default(uuid()) @db.Char(36)
@@ -793,9 +755,7 @@ model Sale {
   @@map("sales")
 }
 
-// =====================================================
 // SALE ITEMS
-// =====================================================
 
 model SaleItem {
   id String @id @default(uuid()) @db.Char(36)
@@ -822,9 +782,7 @@ model SaleItem {
   @@map("sale_items")
 }
 
-// =====================================================
 // SALES RETURNS
-// =====================================================
 
 model SalesReturn {
   id String @id @default(uuid()) @db.Char(36)
@@ -866,9 +824,7 @@ model SalesReturn {
   @@map("sales_returns")
 }
 
-// =====================================================
 // SALES RETURN ITEMS
-// =====================================================
 
 model SalesReturnItem {
   id String @id @default(uuid()) @db.Char(36)
@@ -889,9 +845,7 @@ model SalesReturnItem {
   @@map("sales_return_items")
 }
 
-// =====================================================
 // STOCK MOVEMENTS
-// =====================================================
 
 model StockMovement {
   id String @id @default(uuid()) @db.Char(36)
@@ -932,9 +886,7 @@ model StockMovement {
   @@map("stock_movements")
 }
 
-// =====================================================
 // PAYMENTS
-// =====================================================
 
 model Payment {
   id String @id @default(uuid()) @db.Char(36)
@@ -983,9 +935,7 @@ model Payment {
   @@map("payments")
 }
 
-// =====================================================
 // NOTIFICATIONS
-// =====================================================
 
 model Notification {
   id String @id @default(uuid()) @db.Char(36)
@@ -1015,9 +965,7 @@ model Notification {
   @@map("notifications")
 }
 
-// =====================================================
 // AUDIT LOGS
-// =====================================================
 
 model AuditLog {
   id String @id @default(uuid()) @db.Char(36)
