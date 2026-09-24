@@ -14,16 +14,15 @@ import {
 import Button from "@/components/ui/Button";
 import InputField from "@/components/ui/InputField";
 
-import { setCredentials } from "@/store/slices/authSlice";
 import useLogin from "@/hooks/auth/useLogin";
+import { useQueryClient } from "@tanstack/react-query";
 
 function LoginForm() {
   const router = useRouter();
-  const dispatch = useDispatch();
-
   const login = useLogin();
 
   const [showPassword, setShowPassword] = useState(false);
+  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
     identify: "",
@@ -77,14 +76,10 @@ function LoginForm() {
         password: formData.password,
       },
       {
-        onSuccess: (response) => {
-          const user = response?.data?.user;
-
-          dispatch(
-            setCredentials({
-              user,
-            }),
-          );
+        onSuccess: () => {
+          queryClient.invalidateQueries({
+            queryKey: ["currentUser"],
+          });
 
           router.replace("/dashboard");
         },

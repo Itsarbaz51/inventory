@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { Search, Bell } from "lucide-react";
+import { Search, Bell, UserRound } from "lucide-react";
 import ThemeToggle from "@/theme/ThemeToggle";
 import Button from "./ui/Button";
+import Link from "next/link";
 
 export default function Header() {
   return (
@@ -86,6 +87,23 @@ export default function Header() {
 
         {/* Theme */}
         <ThemeToggle />
+        <Link href={'/dashboard/profile'}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            aria-label="Profile"
+            className="
+            relative
+            text-muted-foreground
+            hover:text-accent-foreground
+            border
+          "
+
+          >
+            <UserRound size={18} />
+          </Button>
+        </Link>s
       </div>
     </header>
   );

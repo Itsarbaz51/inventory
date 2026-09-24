@@ -7,7 +7,7 @@ export const loginApi = async (payload) => {
 };
 
 export const getMeApi = async () => {
-    const response = await api.get("/auth/me");
+    const response = await api.get("/auth/");
 
     return response.data;
 };
