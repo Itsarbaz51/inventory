@@ -18,6 +18,9 @@ import salesReturnItemRoutes from './sales-return-item.route.js';
 import stockMovementRoutes from './stock-movement.route.js';
 import paymentRoutes from './payment.route.js';
 import notificationRoutes from './notification.route.js';
+import purchaseItemRoutes from './purchase-item.route.js';
+import purchaseReturnItems from './purchaseReturnItem.route.js';
+import customerRoutes from './customer.route.js';
 
 const router = Router();
 
@@ -39,4 +42,9 @@ router.use('/sales-return-items', salesReturnItemRoutes);
 router.use('/stock-movements', stockMovementRoutes);
 router.use('/payments', paymentRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/purchase-items', purchaseItemRoutes);
+router.use('/purchase-return-items', purchaseReturnItems);
+router.use('/customers', customerRoutes);
+
+
 export default router;

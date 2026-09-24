@@ -17,3 +17,7 @@ export { default as SalesReturnItemController } from './sales-return-item.contro
 export { default as StockMovementController } from './stock-movement.controller.js';
 export { default as NotificationController } from './notification.controller.js';
 export { default as PaymentController } from './payment.controller.js';
+export { default as PurchaseItemController } from './purchase-item.controller.js';
+export { default as PurchaseReturnController } from './purchaseReturn.controller.js';
+export { default as PurchaseReturnItemController } from './purchaseReturnItem.controller.js';
+export { default as CustomerController } from './customer.controller.js';

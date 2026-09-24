@@ -17,3 +17,7 @@ export { default as SalesReturnItemService } from './sales-return-item.service.j
 export { default as StockMovementService } from './stock-movement.service.js';
 export { default as PaymentService } from './payment.service.js';
 export { default as NotificationService } from './notification.service.js';
+export { default as PurchaseItemServices } from './purchase-item.service.js';
+export { default as PurchaseReturnServices } from './purchaseReturn.service.js'
+export { default as PurchaseReturnItemServices } from './purchaseReturnItem.service.js'
+export { default as CustomerServices } from './customer.service.js'
