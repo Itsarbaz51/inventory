@@ -11,6 +11,13 @@ import productRoute from './product.route.js';
 import warehouseRoute from './warehouse.route.js';
 import warehouseStockRoute from './warehouse-stock.route.js';
 import purchaseRoute from './purchase.route.js';
+import saleRoutes from './sale.route.js';
+import saleItemRoutes from './saleItem.routes.js';
+import salesReturnRoutes from './salesReturn.routes.js';
+import salesReturnItemRoutes from './sales-return-item.route.js';
+import stockMovementRoutes from './stock-movement.route.js';
+import paymentRoutes from './payment.route.js';
+import notificationRoutes from './notification.route.js';
 
 const router = Router();
 
@@ -25,5 +32,11 @@ router.use('/products', productRoute);
 router.use('/warehouses', warehouseRoute);
 router.use('/warehouse-stocks', warehouseStockRoute);
 router.use('/purchases', purchaseRoute);
-
+router.use('/sales', saleRoutes);
+router.use('/sale-items', saleItemRoutes);
+router.use('/sales-returns', salesReturnRoutes);
+router.use('/sales-return-items', salesReturnItemRoutes);
+router.use('/stock-movements', stockMovementRoutes);
+router.use('/payments', paymentRoutes);
+router.use('/notifications', notificationRoutes);
 export default router;
