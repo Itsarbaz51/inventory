@@ -154,9 +154,9 @@ const menuGroups = [
         path: "/tenants",
       },
       {
-        label: "Roles & Permissions",
+        label: "Roles",
         icon: ShieldCheck,
-        path: "/roles",
+        path: "/dashboard/roles",
       },
       {
         label: "Users",
