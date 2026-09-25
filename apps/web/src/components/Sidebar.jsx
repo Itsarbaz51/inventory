@@ -32,6 +32,7 @@ import {
 } from "lucide-react";
 
 import Button from "@/components/ui/Button";
+import useLogout from "@/hooks/auth/useLogout";
 
 const menuGroups = [
   {
@@ -222,6 +223,7 @@ export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const pathname = usePathname();
+  const logout = useLogout();
 
   return (
     <>
@@ -500,20 +502,13 @@ export default function Sidebar() {
               variant="ghost"
               size="icon"
               title="Logout"
-              onClick={() => {
-                // logout logic
-              }}
-              className="
-                h-8
-                w-8
-                shrink-0
-                text-sidebar-foreground/40
-                shadow-none
-                hover:bg-destructive/10
-                hover:text-destructive
-              "
+              disabled={logout.isPending}
+              loading={logout.isPending}
+              onClick={() => logout.mutate()}
+              className="h-8 w-8 shrink-0 text-sidebar-foreground/40 shadow-none hover:bg-destructive/10 hover:text-destructive
+                  "
             >
-              <LogOut size={16} />
+              {!logout.isPending && <LogOut size={16} />}
             </Button>
           </div>
         </div>

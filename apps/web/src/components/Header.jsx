@@ -103,7 +103,7 @@ export default function Header() {
           >
             <UserRound size={18} />
           </Button>
-        </Link>s
+        </Link>
       </div>
     </header>
   );
