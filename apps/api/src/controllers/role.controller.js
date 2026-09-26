@@ -13,72 +13,13 @@ class RoleController {
   }
 
   // UPDATE
-  static async update(payload, req) {
-    const tenantId = req.user?.tenantId;
+  static async update(req, res) {
+    const payload = { ...req.body, ...req.params }
+    const result = await RoleServices.update(payload, req);
 
-    if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
-    }
-
-    const { id } = payload;
-    const { name, description } = req.body;
-
-    if (!id) {
-      throw new ApiError(400, 'Role id is required');
-    }
-
-    const role = await Prisma.role.findFirst({
-      where: {
-        id,
-        tenantId,
-      },
-    });
-
-    if (!role) {
-      throw new ApiError(404, 'Role not found');
-    }
-
-    if (role.isSystem) {
-      throw new ApiError(403, 'System role cannot be modified');
-    }
-
-    if (name !== undefined) {
-      if (!name?.trim()) {
-        throw new ApiError(400, 'Role name cannot be empty');
-      }
-
-      const duplicateRole = await Prisma.role.findFirst({
-        where: {
-          tenantId,
-          name: name.trim(),
-          NOT: {
-            id,
-          },
-        },
-      });
-
-      if (duplicateRole) {
-        throw new ApiError(409, `Role "${name}" already exists`);
-      }
-    }
-
-    const updatedRole = await Prisma.role.update({
-      where: {
-        id,
-      },
-
-      data: {
-        ...(name !== undefined && {
-          name: name.trim(),
-        }),
-
-        ...(description !== undefined && {
-          description: description?.trim() || null,
-        }),
-      },
-    });
-
-    return updatedRole;
+    return res
+      .status(201)
+      .json(ApiResponse.success(result, 'Role updated successfully'));
   }
 
   // GET ALL

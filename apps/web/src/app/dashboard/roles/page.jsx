@@ -114,6 +114,7 @@ export default function RolesPage() {
     if (!confirmed) return;
 
     try {
+      await roleService.delete(role?.id)
       await fetchRoles();
     } catch (error) {
       console.error("Failed to delete role:", error);
