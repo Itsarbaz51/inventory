@@ -3,34 +3,36 @@
 import React from "react";
 import { Edit, Eye, Trash2 } from "lucide-react";
 
+
 import Button from "@/components/ui/Button";
 import EmptyState from "../ui/EmptyState";
 import LoadingState from "../ui/LoadingState";
-import { formatDate } from "@/lib/utils";
 import Pagination from "../ui/Pagination";
+import { formatDate } from "@/lib/utils";
 
-export default function UsersTable({
-  users,
+export default function TenantsTable({
+  tenants,
   loading,
+  onView,
   onEdit,
   onDelete,
-  onView,
-
   page,
   totalPages,
   total,
   limit,
   onPageChange,
 }) {
+
+
   if (loading) {
-    return <LoadingState message="Loading users..." />;
+    return <LoadingState message="Loading tenants..." />;
   }
 
-  if (!users.length) {
+  if (!tenants.length) {
     return (
       <EmptyState
-        title="No users found"
-        description="Try changing your filters or add a new user."
+        title="No tenants found"
+        description="Try changing your filters or add a new tenant."
       />
     );
   }
@@ -38,40 +40,41 @@ export default function UsersTable({
   return (
     <div
       className="
-      overflow-hidden
-      rounded-xl
-      border border-border
-      bg-card
-      shadow-sm
-    "
+        overflow-hidden
+        rounded-xl
+        border border-border
+        bg-card
+        shadow-sm
+      "
     >
       <div className="overflow-x-auto">
-        <table className="w-full min-w-225">
+        <table className="w-full min-w-200">
           <thead className="border-b border-border bg-muted/40">
             <tr>
+              {/* Tenant */}
               <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
-                User
+                Tenant
               </th>
 
+              {/* Phone */}
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
+                Tenant Number
+              </th>
               <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
                 Phone
               </th>
 
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
-                Role
-              </th>
-
+              {/* Status */}
               <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
                 Status
               </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
-                lastLoginAt
-              </th>
 
+              {/* Created */}
               <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
                 Created
               </th>
 
+              {/* Actions */}
               <th className="px-5 py-3 text-right text-xs font-semibold uppercase text-muted-foreground">
                 Actions
               </th>
@@ -79,32 +82,35 @@ export default function UsersTable({
           </thead>
 
           <tbody className="divide-y divide-border">
-            {users?.map((user) => (
-              <tr key={user.id} className="transition-colors hover:bg-muted/30">
-                {/* User */}
+            {tenants.map((tenant) => (
+              <tr
+                key={tenant.id}
+                className="transition-colors hover:bg-muted/30"
+              >
+                {/* Tenant */}
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">
                     <div
                       className="
-                      flex h-10 w-10
-                      shrink-0
-                      items-center justify-center
-                      rounded-full
-                      bg-primary/10
-                      font-semibold
-                      text-primary
-                    "
+                        flex h-10 w-10
+                        shrink-0
+                        items-center justify-center
+                        rounded-full
+                        bg-primary/10
+                        font-semibold
+                        text-primary
+                      "
                     >
-                      {user.name?.charAt(0)?.toUpperCase()}
+                      {tenant.name?.charAt(0)?.toUpperCase() || "T"}
                     </div>
 
                     <div className="min-w-0">
                       <p className="truncate text-sm font-semibold text-foreground">
-                        {user.name}
+                        {tenant.name || "-"}
                       </p>
 
                       <p className="truncate text-xs text-muted-foreground">
-                        {user.email}
+                        {tenant.email || "-"}
                       </p>
                     </div>
                   </div>
@@ -112,22 +118,11 @@ export default function UsersTable({
 
                 {/* Phone */}
                 <td className="px-5 py-4 text-sm text-muted-foreground">
-                  {user.phone || "-"}
+                  {tenant.tenantNumber || "-"}
                 </td>
-
-                {/* Role */}
-                <td className="px-5 py-4">
-                  <span
-                    className="
-                    inline-flex rounded-full
-                    bg-primary/10
-                    px-2.5 py-1
-                    text-xs font-medium
-                    text-primary
-                  "
-                  >
-                    {user.role.name}
-                  </span>
+                {/* Phone */}
+                <td className="px-5 py-4 text-sm text-muted-foreground">
+                  {tenant.phone || "-"}
                 </td>
 
                 {/* Status */}
@@ -137,28 +132,27 @@ export default function UsersTable({
                         inline-flex rounded-full
                         px-2.5 py-1
                         text-xs font-medium
-                        ${user.status === "ACTIVE"
+                        ${tenant.status === "ACTIVE"
                         ? "bg-green-500/10 text-green-600"
-                        : user.status === "BLOCKED"
+                        : tenant.status === "BLOCKED"
                           ? "bg-orange-500/10 text-orange-600"
                           : "bg-destructive/10 text-destructive"
                       }
     `}
                   >
-                    {user.status === "ACTIVE"
+                    {tenant.status === "ACTIVE"
                       ? "Active"
-                      : user.status === "BLOCKED"
+                      : tenant.status === "BLOCKED"
                         ? "Blocked"
                         : "Inactive"}
                   </span>
                 </td>
 
+                {/* Created */}
                 <td className="px-5 py-4 text-sm text-muted-foreground">
-                  {user.lastLoginAt ? formatDate(user.lastLoginAt) : "-"}
-                </td>
-                {/* Date */}
-                <td className="px-5 py-4 text-sm text-muted-foreground">
-                  {user.createdAt ? formatDate(user.createdAt) : "-"}
+                  {tenant.createdAt
+                    ? formatDate(tenant.createdAt)
+                    : "-"}
                 </td>
 
                 {/* Actions */}
@@ -167,36 +161,42 @@ export default function UsersTable({
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onView(user)}
+                      onClick={() => onView(tenant)}
                       title="View"
                     >
                       <Eye size={16} />
                     </Button>
+
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onEdit(user)}
+                      onClick={() => onEdit(tenant)}
                       title="Edit"
                     >
                       <Edit size={16} />
                     </Button>
 
-                    {/* <Button
+                    {/* Delete */}
+                    {/* 
+                    <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => onDelete(user)}
+                      onClick={() => onDelete(tenant)}
                       title="Delete"
                       className="text-destructive hover:text-destructive"
                     >
                       <Trash2 size={16} />
-                    </Button> */}
+                    </Button>
+                    */}
                   </div>
                 </td>
+
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
       <Pagination
         page={page}
         totalPages={totalPages}
@@ -205,14 +205,17 @@ export default function UsersTable({
         onPageChange={onPageChange}
         loading={loading}
       />
+
+
+      {/* Footer */}
       <div
         className="
-        border-t border-border
-        px-5 py-3
-        text-xs text-muted-foreground
-      "
+          border-t border-border
+          px-5 py-3
+          text-xs text-muted-foreground
+        "
       >
-        Showing {users.length} users
+        Showing {tenants.length} tenants
       </div>
     </div>
   );

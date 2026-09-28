@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Mail, Phone, UserRound } from "lucide-react";
+import { Mail, Phone, UserRound, LockKeyhole } from "lucide-react";
 
 import Button from "@/components/ui/Button";
 import InputField from "@/components/ui/InputField";
@@ -12,6 +12,8 @@ const initialForm = {
   email: "",
   phone: "",
   roleId: "",
+  password: "",
+  tenantId: "",
   status: "ACTIVE",
 };
 
@@ -21,10 +23,12 @@ export default function UserForm({
   onCancel,
   loading,
   roleOptions,
+  tenants,
 }) {
   const [formData, setFormData] = useState(initialForm);
-
   const [errors, setErrors] = useState({});
+
+  const isEdit = !!user;
 
   useEffect(() => {
     if (user) {
@@ -33,6 +37,8 @@ export default function UserForm({
         email: user.email || "",
         phone: user.phone || "",
         roleId: user.roleId || "",
+        tenantId: user.tenantId || "",
+        password: "",
         status: user.status || "ACTIVE",
       });
     } else {
@@ -71,6 +77,15 @@ export default function UserForm({
       newErrors.roleId = "Role is required";
     }
 
+    if (!formData.tenantId) {
+      newErrors.tenantId = "Tenant is required";
+    }
+
+    // Password required only while creating
+    if (!isEdit && !formData.password) {
+      newErrors.password = "Password is required";
+    }
+
     if (!formData.status) {
       newErrors.status = "Status is required";
     }
@@ -89,7 +104,8 @@ export default function UserForm({
       ...formData,
     };
 
-    if (user && !payload.password) {
+    // While editing, don't send password if it's empty
+    if (isEdit && !payload.password) {
       delete payload.password;
     }
 
@@ -107,26 +123,30 @@ export default function UserForm({
       {/* Modal */}
       <div
         className="
-      relative z-10
-      flex
-      w-full
-      max-w-2xl
-      max-h-[calc(100vh-24px)]
-      sm:max-h-[calc(100vh-40px)]
-      flex-col
-      overflow-hidden
-      rounded-xl
-      border border-border
-      bg-card
-      shadow-xl
-    "
+          relative z-10
+          flex
+          w-full
+          max-w-2xl
+          max-h-[calc(100vh-24px)]
+          sm:max-h-[calc(100vh-40px)]
+          flex-col
+          overflow-hidden
+          rounded-xl
+          border border-border
+          bg-card
+          shadow-xl
+        "
       >
-        {/* Header - fixed */}
+        {/* Header */}
         <div className="shrink-0 border-b border-border px-6 py-4">
-          <h2 className="text-lg font-semibold text-foreground">Create User</h2>
+          <h2 className="text-lg font-semibold text-foreground">
+            {isEdit ? "Edit User" : "Create User"}
+          </h2>
 
           <p className="mt-1 text-sm text-muted-foreground">
-            Create a new user account.
+            {isEdit
+              ? "Update the user's account information."
+              : "Create a new user account."}
           </p>
         </div>
 
@@ -135,13 +155,13 @@ export default function UserForm({
           {/* Scrollable body */}
           <div
             className="
-          min-h-0
-          flex-1
-          overflow-y-auto
-          overscroll-contain
-          px-6
-          py-5
-        "
+              min-h-0
+              flex-1
+              overflow-y-auto
+              overscroll-contain
+              px-6
+              py-5
+            "
           >
             <div className="space-y-6">
               {/* Basic Information */}
@@ -191,6 +211,22 @@ export default function UserForm({
                     maxLength={10}
                     leftIcon={<Phone size={17} />}
                   />
+
+                  <InputField
+                    label={isEdit ? "Password (Optional)" : "Password"}
+                    name="password"
+                    type="password"
+                    placeholder={
+                      isEdit
+                        ? "Leave blank to keep current password"
+                        : "Enter password"
+                    }
+                    value={formData.password}
+                    onChange={handleChange}
+                    error={errors.password}
+                    leftIcon={<LockKeyhole size={17} />}
+                    required={!isEdit}
+                  />
                 </div>
               </section>
 
@@ -218,7 +254,25 @@ export default function UserForm({
                     placeholder="Select role"
                     required
                     options={roleOptions}
-                    disabled={!!user}
+                    disabled={isEdit}
+                    error={errors.roleId}
+                  />
+
+                  <SelectField
+                    label="Tenant"
+                    name="tenantId"
+                    value={formData.tenantId}
+                    onChange={handleChange}
+                    placeholder="Select tenant"
+                    required
+                    options={
+                      tenants?.map((tenant) => ({
+                        value: tenant.id,
+                        label: tenant.name,
+                      })) || []
+                    }
+                    disabled={isEdit}
+                    error={errors.tenantId}
                   />
 
                   <SelectField
@@ -242,21 +296,22 @@ export default function UserForm({
                         label: "Blocked",
                       },
                     ]}
+                    error={errors.status}
                   />
                 </div>
               </section>
             </div>
           </div>
 
-          {/* Footer - fixed */}
+          {/* Footer */}
           <div
             className="
-          shrink-0
-          border-t border-border
-          bg-card
-          px-6
-          py-4
-        "
+              shrink-0
+              border-t border-border
+              bg-card
+              px-6
+              py-4
+            "
           >
             <div className="flex justify-end gap-2">
               <Button
@@ -269,7 +324,7 @@ export default function UserForm({
               </Button>
 
               <Button type="submit" loading={loading}>
-                {user ? "Update User" : "Create User"}
+                {isEdit ? "Update User" : "Create User"}
               </Button>
             </div>
           </div>

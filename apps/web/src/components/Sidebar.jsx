@@ -151,7 +151,7 @@ const menuGroups = [
       {
         label: "Tenants",
         icon: Building2,
-        path: "/tenants",
+        path: "/dashboard/tenants",
       },
       {
         label: "Roles",

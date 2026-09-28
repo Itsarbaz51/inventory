@@ -13,6 +13,7 @@ export default function UserModal({
   onSubmit,
   loading,
   roleOptions,
+  tenants
 }) {
   if (!open) return null;
 
@@ -84,6 +85,7 @@ export default function UserModal({
             onCancel={onClose}
             loading={loading}
             roleOptions={roleOptions}
+            tenants={tenants}
           />
         </div>
       </div>

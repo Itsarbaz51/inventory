@@ -25,9 +25,8 @@ export default function useCreateUser() {
     onError: (error) => {
       const response = error?.response?.data;
 
-      console.error("Create user failed:", response || error);
-
       toast.error(
+        response.errors ||
         response?.message || "Failed to create user",
         "Validation failed",
       );

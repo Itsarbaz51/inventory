@@ -24,7 +24,7 @@ export default function useUpdateUser() {
 
     onError: (error) => {
       const message =
-        error?.response?.data?.message || "Failed to update user.";
+        error?.response?.data?.errors || error?.response?.data?.message || "Failed to update user.";
 
       toast.error(message, "User update failed");
 

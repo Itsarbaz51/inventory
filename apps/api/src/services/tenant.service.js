@@ -420,7 +420,7 @@ class TenantServices {
   static async getAll(payload) {
     const { page = 1, limit = 10, search, status } = payload;
 
-    const skip = (page - 1) * limit;
+    const skip = (Number(page) - 1) * Number(limit);
 
     const where = {};
 
@@ -472,7 +472,7 @@ class TenantServices {
 
         skip,
 
-        take: limit,
+        take: Number(limit),
 
         orderBy: {
           createdAt: 'desc',
@@ -503,7 +503,7 @@ class TenantServices {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / Number(limit)),
       },
     };
   }

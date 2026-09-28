@@ -6,12 +6,44 @@ import { showToast } from "@/store/slices/toastSlice";
 export default function useToast() {
   const dispatch = useDispatch();
 
+  const formatMessage = (message) => {
+    // Array: [{ field, message }]
+    if (Array.isArray(message)) {
+      return message
+        .map((item) => {
+          if (typeof item === "string") {
+            return item;
+          }
+
+          if (item?.field && item?.message) {
+            return `${item.field}: ${item.message}`;
+          }
+
+          return item?.message || "";
+        })
+        .filter(Boolean)
+        .join("\n");
+    }
+
+    // String
+    if (typeof message === "string") {
+      return message;
+    }
+
+    // Object: { message: "..." }
+    if (message?.message) {
+      return message.message;
+    }
+
+    return "";
+  };
+
   const success = (message, title = "Success") => {
     dispatch(
       showToast({
         type: "success",
         title,
-        message,
+        message: formatMessage(message),
       })
     );
   };
@@ -21,7 +53,7 @@ export default function useToast() {
       showToast({
         type: "error",
         title,
-        message,
+        message: formatMessage(message),
       })
     );
   };
@@ -31,7 +63,7 @@ export default function useToast() {
       showToast({
         type: "warning",
         title,
-        message,
+        message: formatMessage(message),
       })
     );
   };
@@ -41,7 +73,7 @@ export default function useToast() {
       showToast({
         type: "info",
         title,
-        message,
+        message: formatMessage(message),
       })
     );
   };
