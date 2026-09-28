@@ -6,7 +6,7 @@ import HelperUtils from '../utils/helper.utils.js';
 class UserServices {
   static async create(payload, req) {
     if (!payload.tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.badRequest(401, 'Tenant not found');
     }
 
     const {
@@ -20,7 +20,7 @@ class UserServices {
     } = payload;
 
     // ---------------------------------------------------
-    // Check email
+    // Check email within same tenant
     // ---------------------------------------------------
     const existingUser = await Prisma.user.findFirst({
       where: {
@@ -30,7 +30,10 @@ class UserServices {
     });
 
     if (existingUser) {
-      throw new ApiError(409, 'User with this email already exists');
+      throw ApiError.conflict(
+        409,
+        'User with this email already exists in this tenant',
+      );
     }
 
     // ---------------------------------------------------
@@ -45,7 +48,7 @@ class UserServices {
       });
 
       if (!role) {
-        throw new ApiError(404, 'Role not found');
+        throw ApiError.notFound(404, 'Role not found');
       }
     }
 
@@ -105,13 +108,13 @@ class UserServices {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.badRequest(401, 'Tenant not found');
     }
 
     const { id } = payload;
 
     if (!id) {
-      throw new ApiError(400, 'User id is required');
+      throw ApiError.badRequest(400, 'User id is required');
     }
 
     const { name, email, phone, password, roleId, status } = req.body;
@@ -127,7 +130,7 @@ class UserServices {
     });
 
     if (!user) {
-      throw new ApiError(404, 'User not found');
+      throw ApiError.notFound(404, 'User not found');
     }
 
     // ---------------------------------------------------
@@ -146,7 +149,7 @@ class UserServices {
       });
 
       if (existingUser) {
-        throw new ApiError(409, 'User with this email already exists');
+        throw ApiError.conflict(409, 'User with this email already exists');
       }
     }
 
@@ -162,7 +165,7 @@ class UserServices {
       });
 
       if (!role) {
-        throw new ApiError(404, 'Role not found');
+        throw ApiError.notFound(404, 'Role not found');
       }
     }
 
@@ -238,13 +241,13 @@ class UserServices {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.badRequest(401, 'Tenant not found');
     }
 
     const { id } = payload;
 
     if (!id) {
-      throw new ApiError(400, 'User id is required');
+      throw ApiError.badRequest(400, 'User id is required');
     }
 
     const user = await Prisma.user.findFirst({
@@ -287,7 +290,7 @@ class UserServices {
     });
 
     if (!user) {
-      throw new ApiError(404, 'User not found');
+      throw ApiError.notFound(404, 'User not found');
     }
 
     return user;
@@ -300,7 +303,7 @@ class UserServices {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.badRequest(401, 'Tenant not found');
     }
 
     const { page = 1, limit = 10, search, status, roleId } = payload;
@@ -413,13 +416,13 @@ class UserServices {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.badRequest(401, 'Tenant not found');
     }
 
     const { id } = payload;
 
     if (!id) {
-      throw new ApiError(400, 'User id is required');
+      throw ApiError.badRequest(400, 'User id is required');
     }
 
     const user = await Prisma.user.findFirst({
@@ -440,7 +443,7 @@ class UserServices {
     });
 
     if (!user) {
-      throw new ApiError(404, 'User not found');
+      throw ApiError.notFound(404, 'User not found');
     }
 
     // ---------------------------------------------------
@@ -451,7 +454,7 @@ class UserServices {
       user._count.sales > 0 ||
       user._count.payments > 0
     ) {
-      throw new ApiError(
+      throw ApiError.badRequest(
         400,
         'Cannot delete user because transaction records are associated with this user',
       );

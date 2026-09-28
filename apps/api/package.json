@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "seed": " node prisma/user.seed.js"
+    "seed:user": " node prisma/user.seed.js",
+    "seed:permission": " node prisma/permission.seed.js"
   },
   "keywords": [],
   "author": "",

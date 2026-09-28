@@ -1,0 +1,179 @@
+export const PermissionsRegistry = {
+    // DASHBOARD
+    DASHBOARD: {
+        VIEW: 'DASHBOARD.VIEW',
+    },
+
+    // USERS
+    USER: {
+        VIEW: 'USER.VIEW',
+        CREATE: 'USER.CREATE',
+        UPDATE: 'USER.UPDATE',
+        DELETE: 'USER.DELETE',
+    },
+
+    // ROLES
+    ROLE: {
+        VIEW: 'ROLE.VIEW',
+        CREATE: 'ROLE.CREATE',
+        UPDATE: 'ROLE.UPDATE',
+        DELETE: 'ROLE.DELETE',
+        ASSIGN_PERMISSIONS: 'ROLE.ASSIGN_PERMISSIONS',
+    },
+
+    // PERMISSIONS
+    PERMISSION: {
+        VIEW: 'PERMISSION.VIEW',
+        ASSIGN: 'PERMISSION.ASSIGN',
+    },
+
+    // TENANT
+    TENANT: {
+        VIEW: 'TENANT.VIEW',
+        CREATE: 'TENANT.CREATE',
+        UPDATE: 'TENANT.UPDATE',
+        DELETE: 'TENANT.DELETE',
+    },
+
+    // PRODUCTS
+    PRODUCT: {
+        VIEW: 'PRODUCT.VIEW',
+        CREATE: 'PRODUCT.CREATE',
+        UPDATE: 'PRODUCT.UPDATE',
+        DELETE: 'PRODUCT.DELETE',
+        IMPORT: 'PRODUCT.IMPORT',
+        EXPORT: 'PRODUCT.EXPORT',
+    },
+
+    // CATEGORY
+    CATEGORY: {
+        VIEW: 'CATEGORY.VIEW',
+        CREATE: 'CATEGORY.CREATE',
+        UPDATE: 'CATEGORY.UPDATE',
+        DELETE: 'CATEGORY.DELETE',
+    },
+
+    // BRAND
+    BRAND: {
+        VIEW: 'BRAND.VIEW',
+        CREATE: 'BRAND.CREATE',
+        UPDATE: 'BRAND.UPDATE',
+        DELETE: 'BRAND.DELETE',
+    },
+
+    // UNIT
+    UNIT: {
+        VIEW: 'UNIT.VIEW',
+        CREATE: 'UNIT.CREATE',
+        UPDATE: 'UNIT.UPDATE',
+        DELETE: 'UNIT.DELETE',
+    },
+
+    // WAREHOUSE
+    WAREHOUSE: {
+        VIEW: 'WAREHOUSE.VIEW',
+        CREATE: 'WAREHOUSE.CREATE',
+        UPDATE: 'WAREHOUSE.UPDATE',
+        DELETE: 'WAREHOUSE.DELETE',
+    },
+
+    // STOCK
+    STOCK: {
+        VIEW: 'STOCK.VIEW',
+        ADJUST: 'STOCK.ADJUST',
+        IMPORT: 'STOCK.IMPORT',
+        EXPORT: 'STOCK.EXPORT',
+    },
+
+    // STOCK TRANSFER
+    STOCK_TRANSFER: {
+        VIEW: 'STOCK_TRANSFER.VIEW',
+        CREATE: 'STOCK_TRANSFER.CREATE',
+        UPDATE: 'STOCK_TRANSFER.UPDATE',
+        DELETE: 'STOCK_TRANSFER.DELETE',
+        APPROVE: 'STOCK_TRANSFER.APPROVE',
+    },
+
+    // SUPPLIER
+    SUPPLIER: {
+        VIEW: 'SUPPLIER.VIEW',
+        CREATE: 'SUPPLIER.CREATE',
+        UPDATE: 'SUPPLIER.UPDATE',
+        DELETE: 'SUPPLIER.DELETE',
+        EXPORT: 'SUPPLIER.EXPORT',
+    },
+
+    // CUSTOMER
+    CUSTOMER: {
+        VIEW: 'CUSTOMER.VIEW',
+        CREATE: 'CUSTOMER.CREATE',
+        UPDATE: 'CUSTOMER.UPDATE',
+        DELETE: 'CUSTOMER.DELETE',
+        EXPORT: 'CUSTOMER.EXPORT',
+    },
+
+    // PURCHASE
+    PURCHASE: {
+        VIEW: 'PURCHASE.VIEW',
+        CREATE: 'PURCHASE.CREATE',
+        UPDATE: 'PURCHASE.UPDATE',
+        DELETE: 'PURCHASE.DELETE',
+        APPROVE: 'PURCHASE.APPROVE',
+        EXPORT: 'PURCHASE.EXPORT',
+    },
+
+    // PURCHASE RETURN
+    PURCHASE_RETURN: {
+        VIEW: 'PURCHASE_RETURN.VIEW',
+        CREATE: 'PURCHASE_RETURN.CREATE',
+        UPDATE: 'PURCHASE_RETURN.UPDATE',
+        DELETE: 'PURCHASE_RETURN.DELETE',
+        APPROVE: 'PURCHASE_RETURN.APPROVE',
+    },
+
+    // SALES
+    SALE: {
+        VIEW: 'SALE.VIEW',
+        CREATE: 'SALE.CREATE',
+        UPDATE: 'SALE.UPDATE',
+        DELETE: 'SALE.DELETE',
+        APPROVE: 'SALE.APPROVE',
+        EXPORT: 'SALE.EXPORT',
+    },
+
+    // SALES RETURN
+    SALES_RETURN: {
+        VIEW: 'SALES_RETURN.VIEW',
+        CREATE: 'SALES_RETURN.CREATE',
+        UPDATE: 'SALES_RETURN.UPDATE',
+        DELETE: 'SALES_RETURN.DELETE',
+        APPROVE: 'SALES_RETURN.APPROVE',
+    },
+
+    // PAYMENTS
+    PAYMENT: {
+        VIEW: 'PAYMENT.VIEW',
+        CREATE: 'PAYMENT.CREATE',
+        UPDATE: 'PAYMENT.UPDATE',
+        DELETE: 'PAYMENT.DELETE',
+        EXPORT: 'PAYMENT.EXPORT',
+    },
+
+    // REPORTS
+    REPORT: {
+        VIEW: 'REPORT.VIEW',
+        EXPORT: 'REPORT.EXPORT',
+    },
+
+    // NOTIFICATIONS
+    NOTIFICATION: {
+        VIEW: 'NOTIFICATION.VIEW',
+        UPDATE: 'NOTIFICATION.UPDATE',
+    },
+
+    // AUDIT LOGS
+    AUDIT_LOG: {
+        VIEW: 'AUDIT_LOG.VIEW',
+        EXPORT: 'AUDIT_LOG.EXPORT',
+    },
+};

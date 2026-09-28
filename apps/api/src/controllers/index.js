@@ -21,3 +21,4 @@ export { default as PurchaseItemController } from './purchase-item.controller.js
 export { default as PurchaseReturnController } from './purchaseReturn.controller.js';
 export { default as PurchaseReturnItemController } from './purchaseReturnItem.controller.js';
 export { default as CustomerController } from './customer.controller.js';
+export { default as PermissionController } from './permission.controller.js';

@@ -21,3 +21,4 @@ export { default as PurchaseItemServices } from './purchase-item.service.js';
 export { default as PurchaseReturnServices } from './purchaseReturn.service.js'
 export { default as PurchaseReturnItemServices } from './purchaseReturnItem.service.js'
 export { default as CustomerServices } from './customer.service.js'
+export { default as PermissionServices } from './permission.service.js'

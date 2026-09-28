@@ -21,6 +21,7 @@ import notificationRoutes from './notification.route.js';
 import purchaseItemRoutes from './purchase-item.route.js';
 import purchaseReturnItems from './purchaseReturnItem.route.js';
 import customerRoutes from './customer.route.js';
+import permissionRoutes from './permission.route.js';
 
 const router = Router();
 
@@ -45,6 +46,7 @@ router.use('/notifications', notificationRoutes);
 router.use('/purchase-items', purchaseItemRoutes);
 router.use('/purchase-return-items', purchaseReturnItems);
 router.use('/customers', customerRoutes);
+router.use('/permissions', permissionRoutes);
 
 
 export default router;

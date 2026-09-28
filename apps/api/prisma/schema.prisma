@@ -21,16 +21,6 @@ enum UserStatus {
   BLOCKED
 }
 
-enum PermissionAction {
-  VIEW
-  CREATE
-  UPDATE
-  DELETE
-  EXPORT
-  IMPORT
-  APPROVE
-}
-
 enum PurchaseStatus {
   DRAFT
   ORDERED
@@ -247,8 +237,8 @@ model Role {
 model Permission {
   id String @id @default(uuid()) @db.Char(36)
 
-  module String           @db.VarChar(100)
-  action PermissionAction
+  module String @db.VarChar(100)
+  action String @db.VarChar(100)
 
   description String? @db.Text
 

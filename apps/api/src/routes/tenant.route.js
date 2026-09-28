@@ -6,6 +6,8 @@ import asyncHandler from '../utils/AsyncHandler.js';
 
 import { TenantValidationSchemas } from '../validation/index.js';
 import { TenantController } from '../controllers/index.js';
+import PermissionMiddleware from '../middleware/permission.middleware.js';
+import { PermissionsRegistry } from '../utils/PermissionsRegistry.js';
 
 const route = Router();
 
@@ -15,6 +17,12 @@ const route = Router();
 
 route.post(
   '/',
+  AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.TENANT.CREATE,
+  ),
+
   ValidateRequest.validate(TenantValidationSchemas.create),
   asyncHandler(TenantController.create),
 );
@@ -26,6 +34,10 @@ route.post(
 route.get(
   '/',
   AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.ROLE.VIEW,
+  ),
 
   ValidateRequest.validate(TenantValidationSchemas.getAll),
 
@@ -39,6 +51,10 @@ route.get(
 route.get(
   '/:id',
   AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.ROLE.VIEW,
+  ),
 
   ValidateRequest.validate(TenantValidationSchemas.getById),
 
@@ -52,6 +68,10 @@ route.get(
 route.patch(
   '/:id',
   AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.ROLE.UPDATE,
+  ),
 
   ValidateRequest.validate(TenantValidationSchemas.update),
 
@@ -65,6 +85,10 @@ route.patch(
 route.delete(
   '/:id',
   AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.ROLE.DELETE,
+  ),
 
   ValidateRequest.validate(TenantValidationSchemas.delete),
 

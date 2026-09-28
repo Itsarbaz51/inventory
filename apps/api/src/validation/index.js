@@ -21,3 +21,4 @@ export { default as PurchaseItemValidationSchemas } from './purchase-item.valida
 export { default as PurchaseReturnValidationSchemas } from './purchaseReturn.validation.js';
 export { default as PurchaseReturnItemValidationSchemas } from './purchaseReturnItem.validation.js';
 export { default as CustomerValidationSchemas } from './customer.validation.js';
+export { default as PermissionValidationSchemas } from './permission.validation.js';

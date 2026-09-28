@@ -5,6 +5,8 @@ import asyncHandler from '../utils/AsyncHandler.js';
 
 import { UserValidationSchemas } from '../validation/index.js';
 import { UserController } from '../controllers/index.js';
+import PermissionMiddleware from '../middleware/permission.middleware.js';
+import { PermissionsRegistry } from '../utils/PermissionsRegistry.js';
 
 const route = Router();
 
@@ -13,6 +15,10 @@ const route = Router();
 route.post(
   '/',
   AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.USER.CREATE,
+  ),
 
   ValidateRequest.validate(UserValidationSchemas.create),
 
@@ -24,6 +30,10 @@ route.post(
 route.get(
   '/',
   AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.USER.VIEW,
+  ),
 
   ValidateRequest.validate(UserValidationSchemas.getAll),
 
@@ -35,6 +45,10 @@ route.get(
 route.get(
   '/:id',
   AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.ROLE.VIEW,
+  ),
 
   ValidateRequest.validate(UserValidationSchemas.getById),
 
@@ -46,6 +60,10 @@ route.get(
 route.patch(
   '/:id',
   AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.ROLE.UPDATE,
+  ),
 
   ValidateRequest.validate(UserValidationSchemas.update),
 
@@ -57,6 +75,10 @@ route.patch(
 route.delete(
   '/:id',
   AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(["SUPER_ADMIN"]),
+  PermissionMiddleware.check(
+    PermissionsRegistry.ROLE.DELETE,
+  ),
 
   ValidateRequest.validate(UserValidationSchemas.delete),
 
