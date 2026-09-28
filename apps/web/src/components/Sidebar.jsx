@@ -327,7 +327,7 @@ export default function Sidebar() {
 
             <div className="min-w-0">
               <h1 className="truncate text-sm font-bold tracking-tight">
-                Inventory
+                rest
               </h1>
 
               <p className="truncate text-[10px] text-sidebar-foreground/45">

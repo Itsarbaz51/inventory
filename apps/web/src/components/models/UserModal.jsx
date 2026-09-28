@@ -6,7 +6,14 @@ import { X } from "lucide-react";
 import Button from "@/components/ui/Button";
 import UserForm from "../forms/UserForm";
 
-export default function UserModal({ open, onClose, user, onSubmit, loading }) {
+export default function UserModal({
+  open,
+  onClose,
+  user,
+  onSubmit,
+  loading,
+  roleOptions,
+}) {
   if (!open) return null;
 
   return (
@@ -76,6 +83,7 @@ export default function UserModal({ open, onClose, user, onSubmit, loading }) {
             onSubmit={onSubmit}
             onCancel={onClose}
             loading={loading}
+            roleOptions={roleOptions}
           />
         </div>
       </div>

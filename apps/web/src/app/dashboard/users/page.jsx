@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Plus,
   RefreshCw,
-  Search,
   Users,
   UserCheck,
   UserX,
@@ -17,75 +16,89 @@ import StatsCards from "@/components/ui/StatsCards";
 import PageHeader from "@/components/ui/PageHeader";
 import FilterBar from "@/components/ui/FilterBar";
 
+import useUsers from "@/hooks/users/useUsers";
+import useRoles from "@/hooks/roles/useRoles";
+import useCreateUser from "@/hooks/users/useCreateUser";
+import useUpdateUser from "@/hooks/users/useUpdateUser";
+import UserViewModal from "@/components/models/view/UserViewModal";
+
 export default function UsersPage() {
-  const [users, setUsers] = useState([]);
-
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const [search, setSearch] = useState("");
   const [status, setStatus] = useState("ALL");
-  const [role, setRole] = useState("ALL");
+  const [roleId, setRoleId] = useState("ALL");
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
 
-  // Fetch Users
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
+  const [viewingUser, setViewingUser] = useState(null);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  // -----------------------------
+  // QUERY PARAMS
+  // -----------------------------
+  const queryParams = useMemo(() => {
+    const params = {
+      page: 1,
+      limit: 10,
+    };
 
-      // TODO: Replace with API
-      // const response = await getUsers();
-
-      const response = {
-        data: [],
-      };
-
-      setUsers(response?.data || []);
-    } catch (error) {
-      console.error("Failed to fetch users:", error);
-      setUsers([]);
-    } finally {
-      setLoading(false);
+    if (status !== "ALL") {
+      params.status = status;
     }
-  };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+    if (roleId !== "ALL") {
+      params.roleId = roleId;
+    }
 
-  // Filter Users
-  const filteredUsers = useMemo(() => {
-    const searchValue = search.trim().toLowerCase();
+    return params;
+  }, [status, roleId]);
+  // -----------------------------
+  // USERS
+  // -----------------------------
+  const { data, error, isLoading, refetch } = useUsers(queryParams);
+  const createUser = useCreateUser();
+  const updateUser = useUpdateUser();
+  const saving = createUser.isPending || updateUser.isPending;
 
-    return users.filter((user) => {
-      const matchesSearch =
-        !searchValue ||
-        user?.name?.toLowerCase().includes(searchValue) ||
-        user?.email?.toLowerCase().includes(searchValue) ||
-        user?.phone?.toLowerCase().includes(searchValue);
+  // -----------------------------
+  // ROLES
+  // -----------------------------
+  const { data: rolesResponse } = useRoles();
 
-      const matchesStatus =
-        status === "ALL" ||
-        (status === "ACTIVE" && user?.isActive) ||
-        (status === "INACTIVE" && !user?.isActive);
+  const roles = rolesResponse?.data || [];
 
-      const matchesRole = role === "ALL" || user?.role === role;
+  const roleOptions = useMemo(() => {
+    return [
+      {
+        value: "ALL",
+        label: "All Roles",
+      },
 
-      return matchesSearch && matchesStatus && matchesRole;
-    });
-  }, [users, search, status, role]);
+      ...roles.map((role) => ({
+        value: role.id,
+        label: role.name,
+      })),
+    ];
+  }, [roles]);
 
-  // Statistics
+  // -----------------------------
+  // USERS DATA
+  // -----------------------------
+  const users = data?.data?.users || [];
+
+  const pagination = data?.data?.pagination || {};
+
+  // -----------------------------
+  // STATISTICS
+  // -----------------------------
   const userStats = useMemo(() => {
-    const total = users.length;
+    const total = pagination?.total ?? 0;
 
-    const active = users.filter((user) => user?.isActive).length;
+    const active = users.filter((user) => user?.status === "ACTIVE").length;
 
-    const inactive = total - active;
+    const inactive = users.filter((user) => user?.status === "INACTIVE").length;
 
-    const admins = users.filter((user) => user?.role === "ADMIN").length;
+    const admins = users.filter(
+      (user) => user?.role?.name === "SUPER_ADMIN",
+    ).length;
 
     return {
       total,
@@ -93,20 +106,21 @@ export default function UsersPage() {
       inactive,
       admins,
     };
-  }, [users]);
+  }, [users, pagination]);
 
-  // Stats Cards
+  // -----------------------------
+  // STATS CARDS
+  // -----------------------------
   const stats = useMemo(
     () => [
       {
         id: "total",
         title: "Total Users",
         value: userStats.total,
-        description: "All registered users",
+        description: "Total registered users",
         icon: Users,
         iconClassName: "bg-primary/10 text-primary",
       },
-
       {
         id: "active",
         title: "Active Users",
@@ -115,7 +129,6 @@ export default function UsersPage() {
         icon: UserCheck,
         iconClassName: "bg-green-500/10 text-green-600",
       },
-
       {
         id: "inactive",
         title: "Inactive Users",
@@ -124,12 +137,11 @@ export default function UsersPage() {
         icon: UserX,
         iconClassName: "bg-red-500/10 text-red-600",
       },
-
       {
         id: "admins",
-        title: "Administrators",
+        title: "Super Admins",
         value: userStats.admins,
-        description: "Users with admin access",
+        description: "Users with full access",
         icon: ShieldCheck,
         iconClassName: "bg-purple-500/10 text-purple-600",
       },
@@ -137,19 +149,25 @@ export default function UsersPage() {
     [userStats],
   );
 
-  // Add User
+  // -----------------------------
+  // ADD
+  // -----------------------------
   const handleAdd = () => {
     setEditingUser(null);
     setModalOpen(true);
   };
 
-  // Edit User
+  // -----------------------------
+  // EDIT
+  // -----------------------------
   const handleEdit = (user) => {
     setEditingUser(user);
     setModalOpen(true);
   };
 
-  // Delete User
+  // -----------------------------
+  // DELETE
+  // -----------------------------
   const handleDelete = async (user) => {
     const confirmed = window.confirm(
       `Are you sure you want to delete ${user?.name}?`,
@@ -158,43 +176,48 @@ export default function UsersPage() {
     if (!confirmed) return;
 
     try {
-      // TODO:
-      // await deleteUser(user.id);
+      // await userService.delete(user.id);
 
-      await fetchUsers();
+      await refetch();
     } catch (error) {
       console.error("Failed to delete user:", error);
     }
   };
 
-  // Create / Update User
+  const handleView = (user) => {
+    setViewingUser(user);
+    setViewModalOpen(true);
+  };
+
+  const handleCloseViewModal = () => {
+    setViewModalOpen(false);
+    setViewingUser(null);
+  };
+
+  // -----------------------------
+  // CREATE / UPDATE
+  // -----------------------------
   const handleSubmit = async (formData) => {
     try {
-      setSaving(true);
-
       if (editingUser) {
-        // TODO:
-        // await updateUser(editingUser.id, formData);
-
-        console.log("Update user:", editingUser.id, formData);
+        await updateUser.mutateAsync({
+          id: editingUser.id,
+          payload: formData,
+        });
       } else {
-        // TODO:
-        // await createUser(formData);
-
-        console.log("Create user:", formData);
+        await createUser.mutateAsync(formData);
       }
 
       setModalOpen(false);
       setEditingUser(null);
-
-      await fetchUsers();
     } catch (error) {
       console.error("Failed to save user:", error);
-    } finally {
-      setSaving(false);
     }
   };
 
+  // -----------------------------
+  // CLOSE MODAL
+  // -----------------------------
   const handleCloseModal = () => {
     if (saving) return;
 
@@ -202,6 +225,9 @@ export default function UsersPage() {
     setEditingUser(null);
   };
 
+  // -----------------------------
+  // PAGE
+  // -----------------------------
   return (
     <div className="space-y-6">
       <PageHeader
@@ -211,10 +237,10 @@ export default function UsersPage() {
         secondaryAction={{
           label: "Refresh",
           icon: (
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            <RefreshCw size={16} className={isLoading ? "animate-spin" : ""} />
           ),
-          onClick: fetchUsers,
-          disabled: loading,
+          onClick: refetch,
+          disabled: isLoading,
         }}
         primaryAction={{
           label: "Add User",
@@ -226,9 +252,6 @@ export default function UsersPage() {
       <StatsCards stats={stats} columns={4} />
 
       <FilterBar
-        search={search}
-        onSearchChange={setSearch}
-        searchPlaceholder="Search users..."
         filters={[
           {
             name: "status",
@@ -248,46 +271,39 @@ export default function UsersPage() {
                 value: "INACTIVE",
                 label: "Inactive",
               },
+              {
+                value: "BLOCKED",
+                label: "Blocked",
+              },
             ],
           },
+
           {
-            name: "role",
-            value: role,
-            onChange: setRole,
+            name: "roleId",
+            value: roleId,
+            onChange: setRoleId,
             placeholder: "All Roles",
-            options: [
-              {
-                value: "ALL",
-                label: "All Roles",
-              },
-              {
-                value: "ADMIN",
-                label: "Admin",
-              },
-              {
-                value: "MANAGER",
-                label: "Manager",
-              },
-              {
-                value: "STAFF",
-                label: "Staff",
-              },
-            ],
+            options: roleOptions,
           },
         ]}
         onClear={() => {
-          setSearch("");
           setStatus("ALL");
-          setRole("ALL");
+          setRoleId("ALL");
         }}
       />
 
       <UsersTable
-        users={filteredUsers}
-        loading={loading}
+        users={users}
+        loading={isLoading}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onView={handleView}
       />
+
+      <div className="text-sm text-muted-foreground">
+        Showing {users.length} users
+        {pagination?.total != null ? ` of ${pagination.total}` : ""}
+      </div>
 
       <UserModal
         open={modalOpen}
@@ -295,6 +311,12 @@ export default function UsersPage() {
         user={editingUser}
         onSubmit={handleSubmit}
         loading={saving}
+        roleOptions={roleOptions}
+      />
+      <UserViewModal
+        open={viewModalOpen}
+        user={viewingUser}
+        onClose={handleCloseViewModal}
       />
     </div>
   );

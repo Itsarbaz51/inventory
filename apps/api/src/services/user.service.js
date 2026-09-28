@@ -5,13 +5,19 @@ import HelperUtils from '../utils/helper.utils.js';
 
 class UserServices {
   static async create(payload, req) {
-    const tenantId = req.user?.tenantId;
-
-    if (!tenantId) {
+    if (!payload.tenantId) {
       throw new ApiError(401, 'Tenant not found');
     }
 
-    const { name, email, phone, password, roleId, status = 'ACTIVE' } = payload;
+    const {
+      name,
+      email,
+      phone,
+      password,
+      roleId,
+      status = 'ACTIVE',
+      tenantId,
+    } = payload;
 
     // ---------------------------------------------------
     // Check email
@@ -299,7 +305,7 @@ class UserServices {
 
     const { page = 1, limit = 10, search, status, roleId } = payload;
 
-    const skip = (page - 1) * limit;
+    const skip = (Number(page) - 1) * Number(limit);
 
     const where = {
       tenantId,
@@ -353,7 +359,7 @@ class UserServices {
 
         skip,
 
-        take: limit,
+        take: Number(limit),
 
         orderBy: {
           createdAt: 'desc',
@@ -395,7 +401,7 @@ class UserServices {
         page,
         limit,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / Number(limit)),
       },
     };
   }

@@ -1,23 +1,27 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Mail, Phone, UserRound, Lock } from "lucide-react";
+import { Mail, Phone, UserRound } from "lucide-react";
 
 import Button from "@/components/ui/Button";
 import InputField from "@/components/ui/InputField";
 import SelectField from "@/components/ui/SelectField";
-import CheckboxField from "@/components/ui/CheckboxField";
 
 const initialForm = {
   name: "",
   email: "",
   phone: "",
-  password: "",
-  role: "STAFF",
-  isActive: true,
+  roleId: "",
+  status: "ACTIVE",
 };
 
-export default function UserForm({ user, onSubmit, onCancel, loading }) {
+export default function UserForm({
+  user,
+  onSubmit,
+  onCancel,
+  loading,
+  roleOptions,
+}) {
   const [formData, setFormData] = useState(initialForm);
 
   const [errors, setErrors] = useState({});
@@ -28,9 +32,8 @@ export default function UserForm({ user, onSubmit, onCancel, loading }) {
         name: user.name || "",
         email: user.email || "",
         phone: user.phone || "",
-        password: "",
-        role: user.role || "STAFF",
-        isActive: user.isActive ?? true,
+        roleId: user.roleId || "",
+        status: user.status || "ACTIVE",
       });
     } else {
       setFormData(initialForm);
@@ -64,8 +67,12 @@ export default function UserForm({ user, onSubmit, onCancel, loading }) {
       newErrors.email = "Email is required";
     }
 
-    if (!user && !formData.password) {
-      newErrors.password = "Password is required";
+    if (!formData.roleId) {
+      newErrors.roleId = "Role is required";
+    }
+
+    if (!formData.status) {
+      newErrors.status = "Status is required";
     }
 
     setErrors(newErrors);
@@ -181,28 +188,8 @@ export default function UserForm({ user, onSubmit, onCancel, loading }) {
                     value={formData.phone}
                     onChange={handleChange}
                     error={errors.phone}
+                    maxLength={10}
                     leftIcon={<Phone size={17} />}
-                  />
-
-                  <InputField
-                    label={user ? "Password" : "Password"}
-                    name="password"
-                    type="password"
-                    placeholder={
-                      user
-                        ? "Leave blank to keep current password"
-                        : "Enter password"
-                    }
-                    value={formData.password}
-                    onChange={handleChange}
-                    error={errors.password}
-                    leftIcon={<Lock size={17} />}
-                    required={!user}
-                    helperText={
-                      user
-                        ? "Leave blank if you don't want to change the password."
-                        : "Use a strong password for better security."
-                    }
                   />
                 </div>
               </section>
@@ -222,36 +209,39 @@ export default function UserForm({ user, onSubmit, onCancel, loading }) {
                   </p>
                 </div>
 
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <SelectField
                     label="Role"
-                    name="role"
-                    value={formData.role}
+                    name="roleId"
+                    value={formData.roleId}
                     onChange={handleChange}
                     placeholder="Select role"
                     required
-                    options={[
-                      {
-                        value: "ADMIN",
-                        label: "Admin",
-                      },
-                      {
-                        value: "MANAGER",
-                        label: "Manager",
-                      },
-                      {
-                        value: "STAFF",
-                        label: "Staff",
-                      },
-                    ]}
+                    options={roleOptions}
+                    disabled={!!user}
                   />
 
-                  <CheckboxField
-                    name="isActive"
-                    checked={formData.isActive}
+                  <SelectField
+                    label="Status"
+                    name="status"
+                    value={formData.status}
                     onChange={handleChange}
-                    label="Active User"
-                    description="Allow this user to log in and access the system."
+                    placeholder="Select status"
+                    required
+                    options={[
+                      {
+                        value: "ACTIVE",
+                        label: "Active",
+                      },
+                      {
+                        value: "INACTIVE",
+                        label: "Inactive",
+                      },
+                      {
+                        value: "BLOCKED",
+                        label: "Blocked",
+                      },
+                    ]}
                   />
                 </div>
               </section>

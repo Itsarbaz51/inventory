@@ -1,13 +1,20 @@
 "use client";
 
 import React from "react";
-import { Edit, Trash2, MoreHorizontal } from "lucide-react";
+import { Edit, Eye, Trash2 } from "lucide-react";
 
 import Button from "@/components/ui/Button";
 import EmptyState from "../ui/EmptyState";
 import LoadingState from "../ui/LoadingState";
+import { formatDate } from "@/lib/utils";
 
-export default function UsersTable({ users, loading, onEdit, onDelete }) {
+export default function UsersTable({
+  users,
+  loading,
+  onEdit,
+  onDelete,
+  onView,
+}) {
   if (loading) {
     return <LoadingState message="Loading users..." />;
   }
@@ -50,6 +57,9 @@ export default function UsersTable({ users, loading, onEdit, onDelete }) {
               <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
                 Status
               </th>
+              <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
+                lastLoginAt
+              </th>
 
               <th className="px-5 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">
                 Created
@@ -62,7 +72,7 @@ export default function UsersTable({ users, loading, onEdit, onDelete }) {
           </thead>
 
           <tbody className="divide-y divide-border">
-            {users.map((user) => (
+            {users?.map((user) => (
               <tr key={user.id} className="transition-colors hover:bg-muted/30">
                 {/* User */}
                 <td className="px-5 py-4">
@@ -109,7 +119,7 @@ export default function UsersTable({ users, loading, onEdit, onDelete }) {
                     text-primary
                   "
                   >
-                    {user.role}
+                    {user.role.name}
                   </span>
                 </td>
 
@@ -117,30 +127,45 @@ export default function UsersTable({ users, loading, onEdit, onDelete }) {
                 <td className="px-5 py-4">
                   <span
                     className={`
-                      inline-flex rounded-full
-                      px-2.5 py-1
-                      text-xs font-medium
-                      ${
-                        user.isActive
-                          ? "bg-green-500/10 text-green-600"
-                          : "bg-destructive/10 text-destructive"
-                      }
-                    `}
+      inline-flex rounded-full
+      px-2.5 py-1
+      text-xs font-medium
+      ${
+        user.status === "ACTIVE"
+          ? "bg-green-500/10 text-green-600"
+          : user.status === "BLOCKED"
+            ? "bg-orange-500/10 text-orange-600"
+            : "bg-destructive/10 text-destructive"
+      }
+    `}
                   >
-                    {user.isActive ? "Active" : "Inactive"}
+                    {user.status === "ACTIVE"
+                      ? "Active"
+                      : user.status === "BLOCKED"
+                        ? "Blocked"
+                        : "Inactive"}
                   </span>
                 </td>
 
+                <td className="px-5 py-4 text-sm text-muted-foreground">
+                  {user.lastLoginAt ? formatDate(user.lastLoginAt) : "-"}
+                </td>
                 {/* Date */}
                 <td className="px-5 py-4 text-sm text-muted-foreground">
-                  {user.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString()
-                    : "-"}
+                  {user.createdAt ? formatDate(user.createdAt) : "-"}
                 </td>
 
                 {/* Actions */}
                 <td className="px-5 py-4">
                   <div className="flex justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onView(user)}
+                      title="View"
+                    >
+                      <Eye size={16} />
+                    </Button>
                     <Button
                       variant="ghost"
                       size="icon"

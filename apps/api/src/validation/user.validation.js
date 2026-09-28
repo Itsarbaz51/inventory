@@ -29,7 +29,8 @@ const UserValidationSchemas = {
         .min(8, 'Password must be at least 8 characters')
         .max(100, 'Password cannot exceed 100 characters'),
 
-      roleId: z.string().uuid('Invalid role id').optional().nullable(),
+      roleId: z.string().uuid('Invalid role id'),
+      tenantId: z.string().uuid('Invalid tenant id'),
 
       status: z.enum(['ACTIVE', 'INACTIVE', 'BLOCKED']).default('ACTIVE'),
     }),

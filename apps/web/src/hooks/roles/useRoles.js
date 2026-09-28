@@ -2,11 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 
-import { getRolesApi } from "@/services/roleApi";
+import services from "@/services/roleApi";
 
 export default function useRoles() {
   return useQuery({
     queryKey: ["roles"],
-    queryFn: getRolesApi,
+    queryFn: services.getAll,
   });
 }
