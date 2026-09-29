@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Plus, RefreshCw, FolderTree, Layers3 } from "lucide-react";
 
 import CategoryModal from "@/components/models/CategoryModal";
@@ -8,66 +8,65 @@ import StatsCards from "@/components/ui/StatsCards";
 import PageHeader from "@/components/ui/PageHeader";
 import FilterBar from "@/components/ui/FilterBar";
 import CategoriesTable from "@/components/tables/CategoriesTable";
+
 import useToast from "@/hooks/useToast";
-import categoryService from "@/services/categoryApi";
+import useCategories from "@/hooks/category/useCategories";
+import useCreateCategory from "@/hooks/category/useCreateCategory";
+import useUpdateCategory from "@/hooks/category/useUpdateCategory";
+import useDeleteCategory from "@/hooks/category/useDeleteCategory";
 
 export default function CategoriesPage() {
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-
-  const [search, setSearch] = useState("");
-
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+
+  const [page, setPage] = useState(1);
+  const [limit] = useState(20);
+
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("ALL");
+  const [parentType, setParentType] = useState("ALL");
 
   const toast = useToast();
 
   // =====================================================
-  // FETCH CATEGORIES
+  // CATEGORY QUERY
   // =====================================================
 
-  const fetchCategories = async () => {
-    try {
-      setLoading(true);
+  const {
+    data: categoryResponse,
+    isLoading,
+    isFetching,
+    refetch,
+  } = useCategories({
+    page,
+    limit,
+    search,
+    status,
+    parentType,
+  });
 
-      const response = await categoryService.getAll();
+  const createCategory = useCreateCategory();
+  const updateCategory = useUpdateCategory();
+  const deleteCategory = useDeleteCategory();
 
-      setCategories(response?.data || []);
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
+  // Backend response:
+  // {
+  //   data: [],
+  //   meta: {}
+  // }
 
-      setCategories([]);
-
-      const message =
-        error?.response?.data?.message || "Failed to fetch categories";
-
-      toast.error(message, "Category failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  const categories = categoryResponse?.data || [];
 
   // =====================================================
-  // FILTER
+  // LOADING
   // =====================================================
 
-  const filteredCategories = useMemo(() => {
-    const searchValue = search.trim().toLowerCase();
+  const loading = isLoading || isFetching;
 
-    return categories.filter((category) => {
-      if (!searchValue) return true;
-
-      return (
-        category?.name?.toLowerCase().includes(searchValue) ||
-        category?.parent?.name?.toLowerCase().includes(searchValue)
-      );
-    });
-  }, [categories, search]);
+  const saving =
+    createCategory.isPending ||
+    updateCategory.isPending ||
+    deleteCategory.isPending;
 
   // =====================================================
   // STATS
@@ -104,7 +103,7 @@ export default function CategoriesPage() {
         id: "total",
         title: "Total Categories",
         value: categoryStats.total,
-        description: "All categories",
+        description: "Categories in current result",
         icon: FolderTree,
         iconClassName: "bg-primary/10 text-primary",
       },
@@ -150,11 +149,12 @@ export default function CategoriesPage() {
     if (!confirmed) return;
 
     try {
-      await categoryService.delete(category?.id);
+      const response = await deleteCategory.mutateAsync(category?.id);
 
-      toast.success("Category deleted successfully", "Category success");
-
-      await fetchCategories();
+      toast.success(
+        response?.message || "Category deleted successfully",
+        "Category success",
+      );
     } catch (error) {
       const message =
         error?.response?.data?.message || "Failed to delete category";
@@ -169,20 +169,18 @@ export default function CategoriesPage() {
 
   const handleSubmit = async (formData) => {
     try {
-      setSaving(true);
-
       if (editingCategory) {
-        const response = await categoryService.update(
-          editingCategory.id,
-          formData,
-        );
+        const response = await updateCategory.mutateAsync({
+          id: editingCategory.id,
+          payload: formData,
+        });
 
         toast.success(
           response?.message || "Category updated successfully",
           "Category success",
         );
       } else {
-        const response = await categoryService.create(formData);
+        const response = await createCategory.mutateAsync(formData);
 
         toast.success(
           response?.message || "Category created successfully",
@@ -192,15 +190,13 @@ export default function CategoriesPage() {
 
       setModalOpen(false);
       setEditingCategory(null);
-
-      await fetchCategories();
     } catch (error) {
       const message =
-        error?.response?.data?.message || "Failed to save category";
+        error?.response?.data?.errors ||
+        error?.response?.data?.message ||
+        "Failed to save category";
 
       toast.error(message, "Category failed");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -215,6 +211,45 @@ export default function CategoriesPage() {
     setEditingCategory(null);
   };
 
+  // =====================================================
+  // REFRESH
+  // =====================================================
+
+  const handleRefresh = async () => {
+    try {
+      await refetch();
+    } catch (error) {
+      const message =
+        error?.response?.data?.message || "Failed to refresh categories";
+
+      toast.error(message, "Category failed");
+    }
+  };
+
+  // =====================================================
+  // SEARCH
+  // =====================================================
+
+  const handleSearchChange = (value) => {
+    setSearch(value);
+    setPage(1);
+  };
+
+  // =====================================================
+  // CLEAR FILTER
+  // =====================================================
+
+  const handleClear = () => {
+    setSearch("");
+    setStatus("ALL");
+    setParentType("ALL");
+    setPage(1);
+  };
+
+  // =====================================================
+  // RENDER
+  // =====================================================
+
   return (
     <div className="space-y-6">
       <PageHeader
@@ -226,7 +261,7 @@ export default function CategoriesPage() {
           icon: (
             <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
           ),
-          onClick: fetchCategories,
+          onClick: handleRefresh,
           disabled: loading,
         }}
         primaryAction={{
@@ -240,15 +275,13 @@ export default function CategoriesPage() {
 
       <FilterBar
         search={search}
-        onSearchChange={setSearch}
+        onSearchChange={handleSearchChange}
         searchPlaceholder="Search categories..."
-        onClear={() => {
-          setSearch("");
-        }}
+        onClear={handleClear}
       />
 
       <CategoriesTable
-        categories={filteredCategories}
+        categories={categories}
         loading={loading}
         onEdit={handleEdit}
         onDelete={handleDelete}

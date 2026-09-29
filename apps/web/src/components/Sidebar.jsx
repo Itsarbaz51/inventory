@@ -41,7 +41,7 @@ const menuGroups = [
       {
         label: "Dashboard",
         icon: LayoutDashboard,
-        path: "/dashboard/dashboard",
+        path: "/dashboard",
         permission: PermissionsRegistry.DASHBOARD.VIEW,
       },
     ],

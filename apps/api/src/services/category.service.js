@@ -2,9 +2,7 @@ import { ApiError } from '../utils/ApiError.js';
 import Prisma from '../database/db.js';
 
 class CategoryServices {
-  // =====================================================
   // CREATE CATEGORY
-  // =====================================================
   static async create(payload, req) {
     const tenantId = req.user?.tenantId;
 
@@ -69,9 +67,7 @@ class CategoryServices {
     return category;
   }
 
-  // =====================================================
   // UPDATE CATEGORY
-  // =====================================================
   static async update(payload, req) {
     const tenantId = req.user?.tenantId;
 
@@ -182,9 +178,7 @@ class CategoryServices {
     return updatedCategory;
   }
 
-  // =====================================================
   // GET BY ID
-  // =====================================================
   static async getById(payload, req) {
     const tenantId = req.user?.tenantId;
 
@@ -229,9 +223,8 @@ class CategoryServices {
     return category;
   }
 
-  // =====================================================
   // GET ALL
-  // =====================================================
+
   static async getAll(req) {
     const tenantId = req.user?.tenantId;
 
@@ -239,16 +232,49 @@ class CategoryServices {
       throw new ApiError(401, 'Tenant not found');
     }
 
+    const { search = '', status = 'ALL', parentType = 'ALL' } = req.query;
+
+    const where = {
+      tenantId,
+    };
+
+    // Search
+    if (search.trim()) {
+      where.name = {
+        contains: search.trim(),
+        mode: 'insensitive',
+      };
+    }
+
+    // Status
+    if (status === 'ACTIVE') {
+      where.isActive = true;
+    }
+
+    if (status === 'INACTIVE') {
+      where.isActive = false;
+    }
+
+    // Parent type
+    if (parentType === 'ROOT') {
+      where.parentId = null;
+    }
+
+    if (parentType === 'CHILD') {
+      where.parentId = {
+        not: null,
+      };
+    }
+
     const categories = await Prisma.category.findMany({
-      where: {
-        tenantId,
-      },
+      where,
 
       include: {
         parent: {
           select: {
             id: true,
             name: true,
+            parentId: true,
           },
         },
 
@@ -268,9 +294,7 @@ class CategoryServices {
     return categories;
   }
 
-  // =====================================================
   // DELETE
-  // =====================================================
   static async delete(payload, req) {
     const tenantId = req.user?.tenantId;
 
