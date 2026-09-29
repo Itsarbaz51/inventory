@@ -33,6 +33,8 @@ import {
 
 import Button from "@/components/ui/Button";
 import useLogout from "@/hooks/auth/useLogout";
+import { PermissionsRegistry } from "@/lib/PermissionsRegistry";
+import usePermission from "@/hooks/usePermission";
 
 const menuGroups = [
   {
@@ -42,6 +44,7 @@ const menuGroups = [
         label: "Dashboard",
         icon: LayoutDashboard,
         path: "/dashboard",
+        permission: PermissionsRegistry.DASHBOARD.VIEW,
       },
     ],
   },
@@ -53,36 +56,43 @@ const menuGroups = [
         label: "Products",
         icon: Package,
         path: "/products",
+        permission: PermissionsRegistry.PRODUCT.VIEW,
       },
       {
         label: "Categories",
         icon: Tags,
         path: "/categories",
+        permission: PermissionsRegistry.CATEGORY.VIEW,
       },
       {
         label: "Brands",
         icon: Boxes,
         path: "/brands",
+        permission: PermissionsRegistry.BRAND.VIEW,
       },
       {
         label: "Units",
         icon: Ruler,
         path: "/units",
+        permission: PermissionsRegistry.UNIT.VIEW,
       },
       {
         label: "Warehouses",
         icon: Warehouse,
         path: "/warehouses",
+        permission: PermissionsRegistry.WAREHOUSE.VIEW,
       },
       {
         label: "Stock",
         icon: Package,
         path: "/stock",
+        permission: PermissionsRegistry.STOCK.VIEW,
       },
       {
         label: "Stock Movements",
         icon: BarChart3,
         path: "/stock-movements",
+        permission: PermissionsRegistry.STOCK.VIEW,
       },
     ],
   },
@@ -94,16 +104,19 @@ const menuGroups = [
         label: "Suppliers",
         icon: Truck,
         path: "/suppliers",
+        permission: PermissionsRegistry.SUPPLIER.VIEW,
       },
       {
         label: "Purchases",
         icon: ShoppingBag,
         path: "/purchases",
+        permission: PermissionsRegistry.PURCHASE.VIEW,
       },
       {
         label: "Purchase Returns",
         icon: RotateCcw,
         path: "/purchase-returns",
+        permission: PermissionsRegistry.PURCHASE_RETURN.VIEW,
       },
     ],
   },
@@ -115,21 +128,25 @@ const menuGroups = [
         label: "Customers",
         icon: Users,
         path: "/customers",
+        permission: PermissionsRegistry.CUSTOMER.VIEW,
       },
       {
         label: "Sales",
         icon: ShoppingCart,
         path: "/sales",
+        permission: PermissionsRegistry.SALE.VIEW,
       },
       {
         label: "Sales Returns",
         icon: RotateCcw,
         path: "/sales-returns",
+        permission: PermissionsRegistry.SALES_RETURN.VIEW,
       },
       {
         label: "Payments",
         icon: CreditCard,
         path: "/payments",
+        permission: PermissionsRegistry.PAYMENT.VIEW,
       },
     ],
   },
@@ -141,6 +158,7 @@ const menuGroups = [
         label: "Reports",
         icon: BarChart3,
         path: "/reports",
+        permission: PermissionsRegistry.REPORT.VIEW,
       },
     ],
   },
@@ -152,16 +170,19 @@ const menuGroups = [
         label: "Tenants",
         icon: Building2,
         path: "/dashboard/tenants",
+        permission: PermissionsRegistry.TENANT.VIEW,
       },
       {
         label: "Roles",
         icon: ShieldCheck,
         path: "/dashboard/roles",
+        permission: PermissionsRegistry.ROLE.VIEW,
       },
       {
         label: "Users",
         icon: UserCog,
         path: "/dashboard/users",
+        permission: PermissionsRegistry.USER.VIEW,
       },
     ],
   },
@@ -224,6 +245,8 @@ export default function Sidebar() {
 
   const pathname = usePathname();
   const logout = useLogout();
+
+  const { hasPermission, isSuperAdmin } = usePermission();
 
   return (
     <>
@@ -421,37 +444,53 @@ export default function Sidebar() {
           "
         >
           <div className="space-y-6">
-            {menuGroups.map((group) => (
-              <div key={group.title}>
-                <div className="mb-2 flex items-center px-3">
-                  <p
-                    className="
-                      text-[10px]
-                      font-semibold
-                      uppercase
-                      tracking-[0.12em]
-                      text-sidebar-foreground/35
-                    "
-                  >
-                    {group.title}
-                  </p>
-                </div>
+            {menuGroups.map((group) => {
+              const visibleItems = group.items.filter((item) => {
+                // Permission nahi diya hai = public menu
+                if (!item.permission) {
+                  return true;
+                }
 
-                <div className="space-y-1">
-                  {group.items.map((item) => (
-                    <SidebarItem
-                      key={item.path}
-                      item={item}
-                      active={
-                        pathname === item.path ||
-                        pathname.startsWith(`${item.path}/`)
-                      }
-                      onNavigate={() => setMobileOpen(false)}
-                    />
-                  ))}
+                return hasPermission(item.permission);
+              });
+
+              // Group ke andar koi menu visible nahi
+              if (!visibleItems.length) {
+                return null;
+              }
+
+              return (
+                <div key={group.title}>
+                  <div className="mb-2 flex items-center px-3">
+                    <p
+                      className="
+            text-[10px]
+            font-semibold
+            uppercase
+            tracking-[0.12em]
+            text-sidebar-foreground/35
+          "
+                    >
+                      {group.title}
+                    </p>
+                  </div>
+
+                  <div className="space-y-1">
+                    {visibleItems.map((item) => (
+                      <SidebarItem
+                        key={item.path}
+                        item={item}
+                        active={
+                          pathname === item.path ||
+                          pathname.startsWith(`${item.path}/`)
+                        }
+                        onNavigate={() => setMobileOpen(false)}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </nav>
 

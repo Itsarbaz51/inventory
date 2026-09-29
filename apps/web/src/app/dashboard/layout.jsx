@@ -1,6 +1,7 @@
 "use client";
 
 import Header from "@/components/Header";
+import RouteGuard from "@/components/RouteGuard";
 import Sidebar from "@/components/Sidebar";
 
 export default function DashboardLayout({ children }) {
@@ -27,7 +28,7 @@ export default function DashboardLayout({ children }) {
             lg:p-8
           "
         >
-          {children}
+          <RouteGuard>{children}</RouteGuard>
         </main>
       </div>
     </div>

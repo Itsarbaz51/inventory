@@ -1,52 +1,55 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
+import { useSelector } from "react-redux";
 
-export default function usePermission(user) {
-  const isSuperAdmin =
-    user?.role === "SUPER_ADMIN" ||
-    user?.role?.name === "SUPER_ADMIN";
+export default function usePermission() {
+  const user = useSelector((state) => state.auth?.user);
+
+  const isSuperAdmin = user?.role?.name?.toUpperCase() === "SUPER_ADMIN";
+
+  const permissions = useMemo(() => {
+    return (
+      user?.role?.rolePermissions?.map(
+        ({ permission }) => `${permission.module}.${permission.action}`,
+      ) ?? []
+    );
+  }, [user]);
 
   const hasPermission = useCallback(
     (permission) => {
-      if (isSuperAdmin) {
-        return true;
-      }
+      if (isSuperAdmin) return true;
 
-      return (
-        user?.permissions?.includes(permission) || false
-      );
+      return permissions.includes(permission);
     },
-    [user, isSuperAdmin],
+    [permissions, isSuperAdmin],
   );
 
   const hasAnyPermission = useCallback(
-    (permissions = []) => {
-      if (isSuperAdmin) {
-        return true;
-      }
+    (requiredPermissions = []) => {
+      if (isSuperAdmin) return true;
 
-      return permissions.some((permission) =>
-        user?.permissions?.includes(permission),
+      return requiredPermissions.some((permission) =>
+        permissions.includes(permission),
       );
     },
-    [user, isSuperAdmin],
+    [permissions, isSuperAdmin],
   );
 
   const hasAllPermissions = useCallback(
-    (permissions = []) => {
-      if (isSuperAdmin) {
-        return true;
-      }
+    (requiredPermissions = []) => {
+      if (isSuperAdmin) return true;
 
-      return permissions.every((permission) =>
-        user?.permissions?.includes(permission),
+      return requiredPermissions.every((permission) =>
+        permissions.includes(permission),
       );
     },
-    [user, isSuperAdmin],
+    [permissions, isSuperAdmin],
   );
 
   return {
+    user,
+    permissions,
     isSuperAdmin,
     hasPermission,
     hasAnyPermission,
