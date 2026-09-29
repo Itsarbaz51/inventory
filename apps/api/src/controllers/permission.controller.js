@@ -12,12 +12,7 @@ class PermissionController {
 
     return res
       .status(200)
-      .json(
-        ApiResponse.success(
-          result,
-          'Permissions fetched successfully',
-        ),
-      );
+      .json(ApiResponse.success(result, 'Permissions fetched successfully'));
   }
 
   // ==========================================
@@ -30,10 +25,7 @@ class PermissionController {
     return res
       .status(200)
       .json(
-        ApiResponse.success(
-          result,
-          'User permissions fetched successfully',
-        ),
+        ApiResponse.success(result, 'User permissions fetched successfully'),
       );
   }
 
@@ -42,18 +34,12 @@ class PermissionController {
   // ==========================================
 
   static async getRolePermissions(req, res) {
-    const result = await PermissionServices.getRolePermissions(
-      req.params,
-      req,
-    );
+    const result = await PermissionServices.getRolePermissions(req.params, req);
 
     return res
       .status(200)
       .json(
-        ApiResponse.success(
-          result,
-          'Role permissions fetched successfully',
-        ),
+        ApiResponse.success(result, 'Role permissions fetched successfully'),
       );
   }
 
@@ -67,18 +53,14 @@ class PermissionController {
       ...req.body,
     };
 
-    const result = await PermissionServices.updateRolePermissions(
-      payload,
-      req,
-    );
+    console.log(payload);
+
+    const result = await PermissionServices.updateRolePermissions(payload, req);
 
     return res
       .status(200)
       .json(
-        ApiResponse.success(
-          result,
-          'Role permissions updated successfully',
-        ),
+        ApiResponse.success(result, 'Role permissions updated successfully'),
       );
   }
 }

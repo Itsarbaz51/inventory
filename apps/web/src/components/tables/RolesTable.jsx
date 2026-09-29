@@ -1,14 +1,19 @@
 "use client";
 
 import React from "react";
-import { Edit, Trash2, MoreHorizontal } from "lucide-react";
-
+import { Edit, Trash2, ShieldCheck } from "lucide-react";
 import Button from "@/components/ui/Button";
 import EmptyState from "../ui/EmptyState";
 import LoadingState from "../ui/LoadingState";
 import { formatDate } from "@/lib/utils";
 
-export default function RolesTable({ roles, loading, onEdit, onDelete }) {
+export default function RolesTable({
+  roles,
+  loading,
+  onEdit,
+  onDelete,
+  onPermissions,
+}) {
   if (loading) {
     return <LoadingState message="Loading roles..." />;
   }
@@ -92,6 +97,15 @@ export default function RolesTable({ roles, loading, onEdit, onDelete }) {
                 {/* Actions */}
                 <td className="px-5 py-4">
                   <div className="flex justify-end gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => onPermissions(role)}
+                      title="Manage Permissions"
+                    >
+                      <ShieldCheck size={16} />
+                    </Button>
+
                     <Button
                       variant="ghost"
                       size="icon"

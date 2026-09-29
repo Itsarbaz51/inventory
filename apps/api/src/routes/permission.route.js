@@ -15,10 +15,10 @@ const route = Router();
 // ==========================================
 
 route.get(
-    '/',
-    AuthMiddleware.isAuthenticated,
-    AuthMiddleware.authorize(["SUPER_ADMIN"]),
-    asyncHandler(PermissionController.getAll),
+  '/',
+  AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(['SUPER_ADMIN']),
+  asyncHandler(PermissionController.getAll),
 );
 
 // ==========================================
@@ -26,9 +26,9 @@ route.get(
 // ==========================================
 
 route.get(
-    '/my',
-    AuthMiddleware.isAuthenticated,
-    asyncHandler(PermissionController.getMyPermissions),
+  '/my',
+  AuthMiddleware.isAuthenticated,
+  asyncHandler(PermissionController.getMyPermissions),
 );
 
 // ==========================================
@@ -36,11 +36,11 @@ route.get(
 // ==========================================
 
 route.get(
-    '/role/:roleId',
-    AuthMiddleware.isAuthenticated,
-    AuthMiddleware.authorize(["SUPER_ADMIN"]),
-    ValidateRequest.validate(PermissionValidationSchemas.getRolePermissions),
-    asyncHandler(PermissionController.getRolePermissions),
+  '/role/:roleId',
+  AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(['SUPER_ADMIN']),
+  ValidateRequest.validate(PermissionValidationSchemas.getRolePermissions),
+  asyncHandler(PermissionController.getRolePermissions),
 );
 
 // ==========================================
@@ -48,11 +48,11 @@ route.get(
 // ==========================================
 
 route.put(
-    '/role/:roleId',
-    AuthMiddleware.isAuthenticated,
-    AuthMiddleware.authorize(["SUPER_ADMIN"]),
-    ValidateRequest.validate(PermissionValidationSchemas.updateRolePermissions),
-    asyncHandler(PermissionController.updateRolePermissions),
+  '/role/:roleId',
+  AuthMiddleware.isAuthenticated,
+  AuthMiddleware.authorize(['SUPER_ADMIN']),
+  ValidateRequest.validate(PermissionValidationSchemas.updateRolePermissions),
+  asyncHandler(PermissionController.updateRolePermissions),
 );
 
 export default route;

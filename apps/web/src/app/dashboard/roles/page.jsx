@@ -10,6 +10,11 @@ import FilterBar from "@/components/ui/FilterBar";
 import RolesTable from "@/components/tables/RolesTable";
 import roleService from "@/services/roleApi";
 import useToast from "@/hooks/useToast";
+import {
+  usePermissions,
+  useRolePermissions,
+} from "@/hooks/permission/usePermission";
+import PermissionModal from "@/components/models/PermissionModal";
 
 export default function RolesPage() {
   const [roles, setRoles] = useState([]);
@@ -23,7 +28,22 @@ export default function RolesPage() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRole, seteditingRole] = useState(null);
+
+  const [permissionModalOpen, setPermissionModalOpen] = useState(false);
+
+  const [permissionRole, setPermissionRole] = useState(null);
+
+  const [selectedPermissions, setSelectedPermissions] = useState([]);
   const toast = useToast();
+
+  const { data: permissions, loading: permissionsLoading } = usePermissions();
+
+  const {
+    permissions: rolePermissions,
+    loading: rolePermissionsLoading,
+    saving: permissionSaving,
+    updatePermissions,
+  } = useRolePermissions(permissionRole?.id);
 
   // Fetch
   const fetchRoles = async () => {
@@ -41,6 +61,19 @@ export default function RolesPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!rolePermissions?.length) {
+      setSelectedPermissions([]);
+      return;
+    }
+
+    setSelectedPermissions(
+      rolePermissions.map((permission) =>
+        typeof permission === "string" ? permission : permission.id,
+      ),
+    );
+  }, [rolePermissions]);
 
   useEffect(() => {
     fetchRoles();
@@ -93,6 +126,11 @@ export default function RolesPage() {
     [roleStats],
   );
 
+  const handlePermissions = (role) => {
+    setPermissionRole(role);
+    setPermissionModalOpen(true);
+  };
+
   // Add User
   const handleAdd = () => {
     seteditingRole(null);
@@ -114,7 +152,7 @@ export default function RolesPage() {
     if (!confirmed) return;
 
     try {
-      await roleService.delete(role?.id)
+      await roleService.delete(role?.id);
       await fetchRoles();
     } catch (error) {
       console.error("Failed to delete role:", error);
@@ -151,6 +189,22 @@ export default function RolesPage() {
 
     setModalOpen(false);
     seteditingRole(null);
+  };
+
+  const handlePermissionSubmit = async (permissionIds) => {
+    try {
+      await updatePermissions(permissionIds);
+
+      setPermissionModalOpen(false);
+      setPermissionRole(null);
+    } catch (error) {
+      const message =
+        error?.response?.data?.errors ||
+        error?.response?.data?.message ||
+        "Failed to update permissions";
+
+      toast.error(message, "Permission update failed");
+    }
   };
 
   return (
@@ -192,6 +246,7 @@ export default function RolesPage() {
         loading={loading}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onPermissions={handlePermissions}
       />
 
       <RoleModal
@@ -200,6 +255,23 @@ export default function RolesPage() {
         role={editingRole}
         onSubmit={handleSubmit}
         loading={saving}
+      />
+      <PermissionModal
+        open={permissionModalOpen}
+        onClose={() => {
+          if (permissionSaving) return;
+
+          setPermissionModalOpen(false);
+          setPermissionRole(null);
+        }}
+        role={permissionRole}
+        permissions={permissions?.data || permissions || []}
+        selectedPermissions={selectedPermissions}
+        onChange={setSelectedPermissions}
+        onSubmit={handlePermissionSubmit}
+        loading={
+          permissionsLoading || rolePermissionsLoading || permissionSaving
+        }
       />
     </div>
   );

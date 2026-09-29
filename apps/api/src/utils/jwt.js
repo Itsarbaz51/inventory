@@ -1,27 +1,27 @@
-import jwt from "jsonwebtoken";
-import { envConfig } from "../config/index.js";
+import jwt from 'jsonwebtoken';
+import { envConfig } from '../config/index.js';
 
 export const generateAccessToken = (user) => {
-    return jwt.sign(
-        {
-            id: user.id,
-            role: user.role,
-        },
-        envConfig.ACCESS_TOKEN_SECRET,
-        { expiresIn: envConfig.ACCESS_TOKEN_EXPIRES_IN || "1d" }
-    );
+  return jwt.sign(
+    {
+      id: user.id,
+      role: user.role,
+    },
+    envConfig.ACCESS_TOKEN_SECRET,
+    { expiresIn: envConfig.ACCESS_TOKEN_EXPIRES_IN || '7d' },
+  );
 };
 
 export const generateRefreshToken = (user) => {
-    return jwt.sign({ id: user.id }, envConfig.REFRESH_TOKEN_SECRET, {
-        expiresIn: envConfig.REFRESH_TOKEN_EXPIRES_IN || "7d",
-    });
+  return jwt.sign({ id: user.id }, envConfig.REFRESH_TOKEN_SECRET, {
+    expiresIn: envConfig.REFRESH_TOKEN_EXPIRES_IN || '7d',
+  });
 };
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === 'production';
 
 export const cookieOptions = {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction ? "none" : "lax",
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? 'none' : 'lax',
 };

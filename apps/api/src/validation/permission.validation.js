@@ -1,35 +1,31 @@
 import { z } from 'zod';
 
 const PermissionValidationSchemas = {
-    // ==========================================
-    // GET ROLE PERMISSIONS
-    // ==========================================
+  // ==========================================
+  // GET ROLE PERMISSIONS
+  // ==========================================
 
-    getRolePermissions: {
-        params: z.object({
-            roleId: z.string().uuid('Invalid role id'),
-        }),
-    },
+  getRolePermissions: {
+    params: z.object({
+      roleId: z.string().uuid('Invalid role id'),
+    }),
+  },
 
-    // ==========================================
-    // UPDATE ROLE PERMISSIONS
-    // ==========================================
+  // ==========================================
+  // UPDATE ROLE PERMISSIONS
+  // ==========================================
 
-    updateRolePermissions: {
-        params: z.object({
-            roleId: z.string().uuid('Invalid role id'),
-        }),
+  updateRolePermissions: {
+    params: z.object({
+      roleId: z.string().uuid('Invalid role id'),
+    }),
 
-        body: z.object({
-            permissions: z
-                .array(
-                    z.object({
-                        permissionId: z.string().uuid('Invalid permission id'),
-                    }),
-                )
-                .default([]),
-        }),
-    },
+    body: z.object({
+      permissionIds: z
+        .array(z.string().uuid('Invalid permission id'))
+        .default([]),
+    }),
+  },
 };
 
 export default PermissionValidationSchemas;
