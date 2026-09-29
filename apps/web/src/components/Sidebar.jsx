@@ -51,12 +51,6 @@ const menuGroups = [
     title: "Inventory",
     items: [
       {
-        label: "Products",
-        icon: Package,
-        path: "/dashboard/products",
-        permission: PermissionsRegistry.PRODUCT.VIEW,
-      },
-      {
         label: "Categories",
         icon: Tags,
         path: "/dashboard/categories",
@@ -73,6 +67,12 @@ const menuGroups = [
         icon: Ruler,
         path: "/dashboard/units",
         permission: PermissionsRegistry.UNIT.VIEW,
+      },
+      {
+        label: "Products",
+        icon: Package,
+        path: "/dashboard/products",
+        permission: PermissionsRegistry.PRODUCT.VIEW,
       },
       {
         label: "Warehouses",
@@ -207,15 +207,14 @@ function SidebarItem({ item, active, onNavigate }) {
         transition-all
         duration-200
 
-        ${
-          active
-            ? `
+        ${active
+          ? `
               bg-sidebar-primary
               text-sidebar-primary-foreground
               shadow-sm
               hover:bg-sidebar-primary/90
             `
-            : `
+          : `
               text-sidebar-foreground/65
               hover:bg-sidebar-accent
               hover:text-sidebar-accent-foreground

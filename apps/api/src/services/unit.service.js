@@ -164,32 +164,88 @@ class UnitServices {
   // GET ALL UNITS
   // =====================================================
 
-  static async getAll(payload, req) {
+  static async getAll(req) {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw new ApiError(401, "Tenant not found");
     }
 
-    const units = await Prisma.unit.findMany({
-      where: {
-        tenantId,
-      },
+    const {
+      page = 1,
+      limit = 12,
+      search = "",
+      status = "ALL",
+    } = req.query;
 
-      include: {
-        _count: {
-          select: {
-            products: true,
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const currentLimit = Math.max(Number(limit) || 12, 1);
+
+    const skip = (currentPage - 1) * currentLimit;
+
+    const where = {
+      tenantId,
+    };
+
+    if (search.trim()) {
+      where.OR = [
+        {
+          name: {
+            contains: search.trim(),
+            mode: "insensitive",
           },
         },
-      },
+        {
+          shortName: {
+            contains: search.trim(),
+            mode: "insensitive",
+          },
+        },
+      ];
+    }
 
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    if (status === "ACTIVE") {
+      where.isActive = true;
+    }
 
-    return units;
+    if (status === "INACTIVE") {
+      where.isActive = false;
+    }
+
+    const [units, total] = await Prisma.$transaction([
+      Prisma.unit.findMany({
+        where,
+        skip,
+        take: currentLimit,
+
+        include: {
+          _count: {
+            select: {
+              products: true,
+            },
+          },
+        },
+
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+
+      Prisma.unit.count({
+        where,
+      }),
+    ]);
+
+    return {
+      units,
+
+      pagination: {
+        page: currentPage,
+        limit: currentLimit,
+        total,
+        totalPages: Math.ceil(total / currentLimit),
+      },
+    };
   }
 
   // =====================================================

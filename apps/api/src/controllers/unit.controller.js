@@ -43,7 +43,7 @@ class UnitController {
   // =====================================================
 
   static async getAll(req, res) {
-    const units = await UnitServices.getAll(req.query, req);
+    const units = await UnitServices.getAll(req);
 
     return res
       .status(200)
