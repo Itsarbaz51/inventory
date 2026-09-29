@@ -29,7 +29,7 @@ router.use('/auth', authRoute);
 router.use('/roles', roleRoute);
 router.use('/users', userRoute);
 router.use('/tenants', tenantRoute);
-router.use('/categorys', categoryRoute);
+router.use('/categories', categoryRoute);
 router.use('/brands', brandRoute);
 router.use('/units', unitRoute);
 router.use('/products', productRoute);
@@ -47,6 +47,5 @@ router.use('/purchase-items', purchaseItemRoutes);
 router.use('/purchase-return-items', purchaseReturnItems);
 router.use('/customers', customerRoutes);
 router.use('/permissions', permissionRoutes);
-
 
 export default router;
