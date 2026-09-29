@@ -167,19 +167,19 @@ const menuGroups = [
       {
         label: "Tenants",
         icon: Building2,
-        path: "/dashboard/dashboard/tenants",
+        path: "/dashboard/tenants",
         permission: PermissionsRegistry.TENANT.VIEW,
       },
       {
         label: "Roles",
         icon: ShieldCheck,
-        path: "/dashboard/dashboard/roles",
+        path: "/dashboard/roles",
         permission: PermissionsRegistry.ROLE.VIEW,
       },
       {
         label: "Users",
         icon: UserCog,
-        path: "/dashboard/dashboard/users",
+        path: "/dashboard/users",
         permission: PermissionsRegistry.USER.VIEW,
       },
     ],

@@ -195,7 +195,8 @@ class UserServices {
     }
 
     if (password !== undefined) {
-      updateData.password = await bcrypt.hash(password, 12);
+      updateData.password = await CryptoService.encrypt(password);
+
     }
 
     // ---------------------------------------------------

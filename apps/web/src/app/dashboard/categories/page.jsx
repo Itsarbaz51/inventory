@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Plus, RefreshCw, FolderTree, Layers3 } from "lucide-react";
+import {
+  Plus,
+  RefreshCw,
+  FolderTree,
+  Layers3,
+} from "lucide-react";
 
 import CategoryModal from "@/components/models/CategoryModal";
 import StatsCards from "@/components/ui/StatsCards";
@@ -18,6 +23,7 @@ import useDeleteCategory from "@/hooks/category/useDeleteCategory";
 export default function CategoriesPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [parentCategory, setParentCategory] = useState(null);
 
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
@@ -49,13 +55,21 @@ export default function CategoriesPage() {
   const updateCategory = useUpdateCategory();
   const deleteCategory = useDeleteCategory();
 
-  // Backend response:
-  // {
-  //   data: [],
-  //   meta: {}
-  // }
+  // =====================================================
+  // RESPONSE
+  // =====================================================
 
-  const categories = categoryResponse?.data || [];
+  const categoryData = categoryResponse?.data || {};
+
+  const categories = categoryData?.categories || [];
+
+  const pagination = categoryData?.pagination ||
+    categoryResponse?.meta || {
+    page,
+    limit,
+    total: 0,
+    totalPages: 0,
+  };
 
   // =====================================================
   // LOADING
@@ -69,21 +83,54 @@ export default function CategoriesPage() {
     deleteCategory.isPending;
 
   // =====================================================
+  // STATUS CHANGE
+  // =====================================================
+
+  const handleStatusChange = (value) => {
+    setStatus(value);
+    setPage(1);
+  };
+
+  // =====================================================
+  // PARENT TYPE CHANGE
+  // =====================================================
+
+  const handleParentTypeChange = (value) => {
+    setParentType(value);
+    setPage(1);
+  };
+
+  // =====================================================
   // STATS
   // =====================================================
 
   const categoryStats = useMemo(() => {
-    const total = categories.length;
+    let total = 0;
+    let active = 0;
+    let mainCategories = 0;
+    let subCategories = 0;
 
-    const active = categories.filter((category) => category?.isActive).length;
+    const walk = (items = []) => {
+      items.forEach((category) => {
+        total++;
 
-    const mainCategories = categories.filter(
-      (category) => !category?.parentId,
-    ).length;
+        if (category?.isActive) {
+          active++;
+        }
 
-    const subCategories = categories.filter(
-      (category) => category?.parentId,
-    ).length;
+        if (category?.parentId) {
+          subCategories++;
+        } else {
+          mainCategories++;
+        }
+
+        if (category?.children?.length) {
+          walk(category.children);
+        }
+      });
+    };
+
+    walk(categories);
 
     return {
       total,
@@ -120,11 +167,22 @@ export default function CategoriesPage() {
   );
 
   // =====================================================
-  // ADD
+  // ADD MAIN CATEGORY
   // =====================================================
 
   const handleAdd = () => {
     setEditingCategory(null);
+    setParentCategory(null);
+    setModalOpen(true);
+  };
+
+  // =====================================================
+  // ADD SUBCATEGORY
+  // =====================================================
+
+  const handleAddSubcategory = (category) => {
+    setEditingCategory(null);
+    setParentCategory(category);
     setModalOpen(true);
   };
 
@@ -133,6 +191,7 @@ export default function CategoriesPage() {
   // =====================================================
 
   const handleEdit = (category) => {
+    setParentCategory(null);
     setEditingCategory(category);
     setModalOpen(true);
   };
@@ -149,17 +208,23 @@ export default function CategoriesPage() {
     if (!confirmed) return;
 
     try {
-      const response = await deleteCategory.mutateAsync(category?.id);
+      const response =
+        await deleteCategory.mutateAsync(category?.id);
 
       toast.success(
-        response?.message || "Category deleted successfully",
+        response?.message ||
+        "Category deleted successfully",
         "Category success",
       );
     } catch (error) {
       const message =
-        error?.response?.data?.message || "Failed to delete category";
+        error?.response?.data?.message ||
+        "Failed to delete category";
 
-      toast.error(message, "Category failed");
+      toast.error(
+        message,
+        "Category failed",
+      );
     }
   };
 
@@ -170,33 +235,43 @@ export default function CategoriesPage() {
   const handleSubmit = async (formData) => {
     try {
       if (editingCategory) {
-        const response = await updateCategory.mutateAsync({
-          id: editingCategory.id,
-          payload: formData,
-        });
+        const response =
+          await updateCategory.mutateAsync({
+            id: editingCategory.id,
+            payload: formData,
+          });
 
         toast.success(
-          response?.message || "Category updated successfully",
+          response?.message ||
+          "Category updated successfully",
           "Category success",
         );
       } else {
-        const response = await createCategory.mutateAsync(formData);
+        const response =
+          await createCategory.mutateAsync(
+            formData,
+          );
 
         toast.success(
-          response?.message || "Category created successfully",
+          response?.message ||
+          "Category created successfully",
           "Category success",
         );
       }
 
       setModalOpen(false);
       setEditingCategory(null);
+      setParentCategory(null);
     } catch (error) {
       const message =
         error?.response?.data?.errors ||
         error?.response?.data?.message ||
         "Failed to save category";
 
-      toast.error(message, "Category failed");
+      toast.error(
+        message,
+        "Category failed",
+      );
     }
   };
 
@@ -209,6 +284,7 @@ export default function CategoriesPage() {
 
     setModalOpen(false);
     setEditingCategory(null);
+    setParentCategory(null);
   };
 
   // =====================================================
@@ -220,9 +296,13 @@ export default function CategoriesPage() {
       await refetch();
     } catch (error) {
       const message =
-        error?.response?.data?.message || "Failed to refresh categories";
+        error?.response?.data?.message ||
+        "Failed to refresh categories";
 
-      toast.error(message, "Category failed");
+      toast.error(
+        message,
+        "Category failed",
+      );
     }
   };
 
@@ -259,7 +339,14 @@ export default function CategoriesPage() {
         secondaryAction={{
           label: "Refresh",
           icon: (
-            <RefreshCw size={16} className={loading ? "animate-spin" : ""} />
+            <RefreshCw
+              size={16}
+              className={
+                loading
+                  ? "animate-spin"
+                  : ""
+              }
+            />
           ),
           onClick: handleRefresh,
           disabled: loading,
@@ -271,26 +358,110 @@ export default function CategoriesPage() {
         }}
       />
 
-      <StatsCards stats={stats} columns={4} />
+      {/* =================================================
+          STATS
+      ================================================= */}
+
+      <StatsCards
+        stats={stats}
+        columns={4}
+      />
+
+      {/* =================================================
+          FILTER
+      ================================================= */}
 
       <FilterBar
         search={search}
         onSearchChange={handleSearchChange}
         searchPlaceholder="Search categories..."
         onClear={handleClear}
+        filters={[
+          {
+            name: "status",
+            value: status,
+            onChange: handleStatusChange,
+            placeholder: "All Status",
+            options: [
+              {
+                value: "ALL",
+                label: "All Status",
+              },
+              {
+                value: "ACTIVE",
+                label: "Active",
+              },
+              {
+                value: "INACTIVE",
+                label: "Inactive",
+              },
+            ],
+          },
+          {
+            name: "parentType",
+            value: parentType,
+            onChange: handleParentTypeChange,
+            placeholder: "All Categories",
+            options: [
+              {
+                value: "ALL",
+                label: "All Categories",
+              },
+              {
+                value: "ROOT",
+                label: "Main Categories",
+              },
+              {
+                value: "CHILD",
+                label: "Sub Categories",
+              },
+            ],
+          },
+        ]}
       />
+
+      {/* =================================================
+          TABLE
+      ================================================= */}
 
       <CategoriesTable
         categories={categories}
         loading={loading}
         onEdit={handleEdit}
         onDelete={handleDelete}
+        onAddSubcategory={
+          handleAddSubcategory
+        }
+        page={
+          Number(pagination.page) || page
+        }
+        totalPages={
+          Number(
+            pagination.totalPages,
+          ) || 1
+        }
+        total={
+          Number(
+            pagination.total,
+          ) || 0
+        }
+        limit={
+          Number(
+            pagination.limit,
+          ) || limit
+        }
+        onPageChange={setPage}
       />
+
+      {/* =================================================
+          MODAL
+      ================================================= */}
 
       <CategoryModal
         open={modalOpen}
         onClose={handleCloseModal}
         category={editingCategory}
+        parentCategory={parentCategory}
         categories={categories}
         onSubmit={handleSubmit}
         loading={saving}

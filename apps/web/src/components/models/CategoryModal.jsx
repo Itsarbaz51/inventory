@@ -9,11 +9,14 @@ export default function CategoryModal({
   open,
   onClose,
   category,
+  parentCategory,
   categories,
   onSubmit,
   loading,
 }) {
   if (!open) return null;
+
+  const isAddingSubcategory = !category && !!parentCategory;
 
   return (
     <div
@@ -64,13 +67,19 @@ export default function CategoryModal({
         >
           <div>
             <h2 className="text-lg font-semibold">
-              {category ? "Edit Category" : "Add Category"}
+              {category
+                ? "Edit Category"
+                : isAddingSubcategory
+                  ? "Add Subcategory"
+                  : "Add Category"}
             </h2>
 
             <p className="mt-1 text-xs text-muted-foreground">
               {category
                 ? "Update category information."
-                : "Create a new product category."}
+                : isAddingSubcategory
+                  ? `Create a category under "${parentCategory?.name}".`
+                  : "Create a new main category."}
             </p>
           </div>
 
@@ -84,9 +93,9 @@ export default function CategoryModal({
           </Button>
         </div>
 
-        {/* Form */}
         <CategoryForm
           category={category}
+          parentCategory={parentCategory}
           categories={categories}
           onSubmit={onSubmit}
           onCancel={onClose}

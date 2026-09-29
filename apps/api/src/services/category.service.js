@@ -224,7 +224,6 @@ class CategoryServices {
   }
 
   // GET ALL
-
   static async getAll(req) {
     const tenantId = req.user?.tenantId;
 
@@ -232,7 +231,17 @@ class CategoryServices {
       throw new ApiError(401, 'Tenant not found');
     }
 
-    const { search = '', status = 'ALL', parentType = 'ALL' } = req.query;
+    const {
+      page = 1,
+      limit = 10,
+      search = '',
+      status = 'ALL',
+      parentType = 'ALL',
+    } = req.query;
+
+    const pageNumber = Math.max(Number(page), 1);
+    const limitNumber = Math.max(Number(limit), 1);
+    const skip = (pageNumber - 1) * limitNumber;
 
     const where = {
       tenantId,
@@ -242,7 +251,7 @@ class CategoryServices {
     if (search.trim()) {
       where.name = {
         contains: search.trim(),
-        mode: 'insensitive',
+        // mode: 'insensitive',
       };
     }
 
@@ -266,18 +275,49 @@ class CategoryServices {
       };
     }
 
-    const categories = await Prisma.category.findMany({
-      where,
+    // ---------------------------------------------------
+    // Get paginated ROOT categories
+    // ---------------------------------------------------
+    const rootWhere = {
+      ...where,
+      parentId: null,
+    };
 
-      include: {
-        parent: {
-          select: {
-            id: true,
-            name: true,
-            parentId: true,
+    const [rootCategories, total] = await Prisma.$transaction([
+      Prisma.category.findMany({
+        where: rootWhere,
+
+        skip,
+        take: limitNumber,
+
+        include: {
+          _count: {
+            select: {
+              products: true,
+              children: true,
+            },
           },
         },
 
+        orderBy: {
+          name: 'asc',
+        },
+      }),
+
+      Prisma.category.count({
+        where: rootWhere,
+      }),
+    ]);
+
+    // ---------------------------------------------------
+    // Get ALL categories belonging to selected roots
+    // ---------------------------------------------------
+    const allCategories = await Prisma.category.findMany({
+      where: {
+        tenantId,
+      },
+
+      include: {
         _count: {
           select: {
             products: true,
@@ -291,8 +331,59 @@ class CategoryServices {
       },
     });
 
-    return categories;
+    // ---------------------------------------------------
+    // Create category map
+    // ---------------------------------------------------
+    const categoryMap = new Map();
+
+    allCategories.forEach((category) => {
+      categoryMap.set(category.id, {
+        ...category,
+        children: [],
+      });
+    });
+
+    // ---------------------------------------------------
+    // Build parent -> child -> sub-child tree
+    // ---------------------------------------------------
+    const tree = [];
+
+    allCategories.forEach((category) => {
+      const current = categoryMap.get(category.id);
+
+      if (category.parentId) {
+        const parent = categoryMap.get(category.parentId);
+
+        if (parent) {
+          parent.children.push(current);
+        }
+      }
+    });
+
+    // ---------------------------------------------------
+    // Only return paginated ROOT categories
+    // with their complete children tree
+    // ---------------------------------------------------
+    rootCategories.forEach((root) => {
+      const rootNode = categoryMap.get(root.id);
+
+      if (rootNode) {
+        tree.push(rootNode);
+      }
+    });
+
+    return {
+      categories: tree,
+
+      pagination: {
+        page: pageNumber,
+        limit: limitNumber,
+        total,
+        totalPages: Math.ceil(total / limitNumber),
+      },
+    };
   }
+
 
   // DELETE
   static async delete(payload, req) {
