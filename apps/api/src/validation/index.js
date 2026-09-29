@@ -3,7 +3,7 @@ export { default as RoleValidationSchemas } from './role.validation.js';
 export { default as UserValidationSchemas } from './user.validation.js';
 export { default as TenantValidationSchemas } from './tenant.validation.js';
 export { default as CategoryValidationSchemas } from './category.validation.js';
-export { default as BrandValidationSchemas } from './category.validation.js';
+export { default as BrandValidationSchemas } from './brand.validation.js';
 export { default as UnitValidationSchemas } from './unit.validation.js';
 export { default as ProductValidationSchemas } from './product.validation.js';
 export { default as WarehouseValidationSchemas } from './warehouse.validation.js';

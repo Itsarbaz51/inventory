@@ -1,4 +1,4 @@
-import {BrandServices} from '../services/index.js';
+import { BrandServices } from '../services/index.js';
 import { ApiResponse } from '../utils/ApiResponse.js';
 
 class BrandController {
@@ -68,7 +68,6 @@ class BrandController {
 
   static async getAll(req, res) {
     const brands = await BrandServices.getAll(
-      req.query,
       req,
     );
 

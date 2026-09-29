@@ -10,7 +10,7 @@ class BrandServices {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.internal(401, 'Tenant not found');
     }
 
     const {
@@ -20,7 +20,7 @@ class BrandServices {
     } = payload;
 
     if (!name?.trim()) {
-      throw new ApiError(400, 'Brand name is required');
+      throw ApiError.badRequest(400, 'Brand name is required');
     }
 
     // Check duplicate brand inside same tenant
@@ -32,7 +32,7 @@ class BrandServices {
     });
 
     if (existingBrand) {
-      throw new ApiError(
+      throw ApiError.conflict(
         409,
         `Brand "${name.trim()}" already exists`,
       );
@@ -58,13 +58,13 @@ class BrandServices {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.internal(401, 'Tenant not found');
     }
 
     const { id } = payload;
 
     if (!id) {
-      throw new ApiError(400, 'Brand id is required');
+      throw ApiError.badRequest(400, 'Brand id is required');
     }
 
     const brand = await Prisma.brand.findFirst({
@@ -75,7 +75,7 @@ class BrandServices {
     });
 
     if (!brand) {
-      throw new ApiError(404, 'Brand not found');
+      throw ApiError.notFound(404, 'Brand not found');
     }
 
     const {
@@ -87,7 +87,7 @@ class BrandServices {
     // Check duplicate name
     if (name !== undefined) {
       if (!name?.trim()) {
-        throw new ApiError(
+        throw ApiError.badRequest(
           400,
           'Brand name cannot be empty',
         );
@@ -104,7 +104,7 @@ class BrandServices {
       });
 
       if (duplicateBrand) {
-        throw new ApiError(
+        throw ApiError.conflict(
           409,
           `Brand "${name.trim()}" already exists`,
         );
@@ -142,13 +142,13 @@ class BrandServices {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.internal(401, 'Tenant not found');
     }
 
     const { id } = payload;
 
     if (!id) {
-      throw new ApiError(400, 'Brand id is required');
+      throw ApiError.badRequest(400, 'Brand id is required');
     }
 
     const brand = await Prisma.brand.findFirst({
@@ -167,7 +167,7 @@ class BrandServices {
     });
 
     if (!brand) {
-      throw new ApiError(404, 'Brand not found');
+      throw ApiError.notFound(404, 'Brand not found');
     }
 
     return brand;
@@ -176,34 +176,107 @@ class BrandServices {
   // =====================================================
   // GET ALL BRANDS
   // =====================================================
-
-  static async getAll(payload, req) {
+  static async getAll(req) {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.badRequest(401, "Tenant not found");
     }
 
-    const brands = await Prisma.brand.findMany({
-      where: {
-        tenantId,
-      },
+    const {
+      page = 1,
+      limit = 20,
+      search = "",
+      status = "ALL",
+    } = req.query;
 
-      include: {
-        _count: {
-          select: {
-            products: true,
+    const currentPage = Math.max(Number(page) || 1, 1);
+    const currentLimit = Math.max(Number(limit) || 20, 1);
+
+    const skip = (currentPage - 1) * currentLimit;
+
+    const where = {
+      tenantId,
+    };
+
+    // =====================================================
+    // SEARCH
+    // =====================================================
+
+    if (search.trim()) {
+      where.OR = [
+        {
+          name: {
+            contains: search.trim(),
+            // mode: "insensitive",
           },
         },
-      },
+        {
+          description: {
+            contains: search.trim(),
+            // mode: "insensitive",
+          },
+        },
+      ];
+    }
 
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    // =====================================================
+    // STATUS
+    // =====================================================
 
-    return brands;
+    if (status === "ACTIVE") {
+      where.isActive = true;
+    }
+
+    if (status === "INACTIVE") {
+      where.isActive = false;
+    }
+
+    // =====================================================
+    // GET DATA + TOTAL
+    // =====================================================
+
+    const [brands, total] = await Prisma.$transaction([
+      Prisma.brand.findMany({
+        where,
+
+        skip,
+        take: currentLimit,
+
+        include: {
+          _count: {
+            select: {
+              products: true,
+            },
+          },
+        },
+
+        orderBy: {
+          createdAt: "desc",
+        },
+      }),
+
+      Prisma.brand.count({
+        where,
+      }),
+    ]);
+
+    // =====================================================
+    // RESPONSE
+    // =====================================================
+
+    return {
+      brands,
+
+      pagination: {
+        page: currentPage,
+        limit: currentLimit,
+        total,
+        totalPages: Math.ceil(total / currentLimit),
+      },
+    };
   }
+
 
   // =====================================================
   // DELETE BRAND
@@ -213,13 +286,13 @@ class BrandServices {
     const tenantId = req.user?.tenantId;
 
     if (!tenantId) {
-      throw new ApiError(401, 'Tenant not found');
+      throw ApiError.badRequest(401, 'Tenant not found');
     }
 
     const { id } = payload;
 
     if (!id) {
-      throw new ApiError(400, 'Brand id is required');
+      throw ApiError.badRequest(400, 'Brand id is required');
     }
 
     const brand = await Prisma.brand.findFirst({
@@ -238,12 +311,12 @@ class BrandServices {
     });
 
     if (!brand) {
-      throw new ApiError(404, 'Brand not found');
+      throw ApiError.notFound(404, 'Brand not found');
     }
 
     // Don't delete if products are assigned
     if (brand._count.products > 0) {
-      throw new ApiError(
+      throw ApiError.badRequest(
         400,
         'Cannot delete brand because products are assigned to this brand',
       );
