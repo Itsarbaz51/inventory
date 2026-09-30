@@ -44,7 +44,7 @@ class CustomerServices {
       if (existingEmail) {
         throw new ApiError(
           409,
-          `Customer with email "${email}" already exists`
+          `Customer with email "${email}" already exists`,
         );
       }
     }
@@ -61,7 +61,7 @@ class CustomerServices {
       if (existingPhone) {
         throw new ApiError(
           409,
-          `Customer with phone "${phone}" already exists`
+          `Customer with phone "${phone}" already exists`,
         );
       }
     }
@@ -148,7 +148,7 @@ class CustomerServices {
       if (duplicateEmail) {
         throw new ApiError(
           409,
-          `Customer with email "${email}" already exists`
+          `Customer with email "${email}" already exists`,
         );
       }
     }
@@ -168,7 +168,7 @@ class CustomerServices {
       if (duplicatePhone) {
         throw new ApiError(
           409,
-          `Customer with phone "${phone}" already exists`
+          `Customer with phone "${phone}" already exists`,
         );
       }
     }
@@ -290,27 +290,110 @@ class CustomerServices {
       throw new ApiError(401, 'Tenant not found');
     }
 
-    const customers = await Prisma.customer.findMany({
-      where: {
-        tenantId,
-      },
+    const { page = 1, limit = 10, search, isActive } = req.query;
 
-      include: {
-        _count: {
-          select: {
-            sales: true,
-            salesReturns: true,
-            payments: true,
+    const pageNumber = Math.max(Number(page) || 1, 1);
+    const limitNumber = Math.min(Math.max(Number(limit) || 10, 1), 100);
+
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // ---------------------------------------------------
+    // WHERE
+    // ---------------------------------------------------
+
+    const where = {
+      tenantId,
+    };
+
+    // Active / inactive filter
+    if (isActive !== undefined) {
+      where.isActive = isActive === 'true';
+    }
+
+    // Search
+    if (search?.trim()) {
+      const searchValue = search.trim();
+
+      where.OR = [
+        {
+          name: {
+            contains: searchValue,
+            // mode: "insensitive", // PostgreSQL only
           },
         },
-      },
+        {
+          phone: {
+            contains: searchValue,
+          },
+        },
+        {
+          email: {
+            contains: searchValue,
+          },
+        },
+        {
+          gstNumber: {
+            contains: searchValue,
+          },
+        },
+        {
+          panNumber: {
+            contains: searchValue,
+          },
+        },
+        {
+          city: {
+            contains: searchValue,
+          },
+        },
+      ];
+    }
 
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    // ---------------------------------------------------
+    // GET DATA + COUNT
+    // ---------------------------------------------------
 
-    return customers;
+    const [customers, total] = await Promise.all([
+      Prisma.customer.findMany({
+        where,
+
+        include: {
+          _count: {
+            select: {
+              sales: true,
+              salesReturns: true,
+              payments: true,
+            },
+          },
+        },
+
+        orderBy: {
+          createdAt: 'desc',
+        },
+
+        skip,
+        take: limitNumber,
+      }),
+
+      Prisma.customer.count({
+        where,
+      }),
+    ]);
+
+    // ---------------------------------------------------
+    // RESPONSE
+    // ---------------------------------------------------
+
+    return {
+      customers,
+
+      pagination: {
+        page: pageNumber,
+        limit: limitNumber,
+        total,
+        totalPages: Math.ceil(total / limitNumber),
+      },
+    };
   }
 
   // DELETE
@@ -356,7 +439,7 @@ class CustomerServices {
     ) {
       throw new ApiError(
         400,
-        'Cannot delete customer because transactions are associated with this customer'
+        'Cannot delete customer because transactions are associated with this customer',
       );
     }
 
