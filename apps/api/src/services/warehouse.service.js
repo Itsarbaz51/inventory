@@ -220,40 +220,61 @@ class WarehouseServices {
 
     const { search, isActive, page = 1, limit = 20 } = req.query;
 
-    const skip = (page - 1) * limit;
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+
+    const skip = (pageNumber - 1) * limitNumber;
+
+    // =====================================================
+    // BOOLEAN CONVERSION
+    // =====================================================
+
+    let activeFilter;
+
+    if (isActive !== undefined) {
+      activeFilter = isActive === 'true';
+    }
+
+    // =====================================================
+    // WHERE
+    // =====================================================
 
     const where = {
       tenantId,
 
-      ...(isActive !== undefined && {
-        isActive,
+      ...(activeFilter !== undefined && {
+        isActive: activeFilter,
       }),
 
-      ...(search && {
+      ...(search?.trim() && {
         OR: [
           {
             name: {
-              contains: search,
+              contains: search.trim(),
             },
           },
           {
             code: {
-              contains: search,
+              contains: search.trim(),
             },
           },
           {
             city: {
-              contains: search,
+              contains: search.trim(),
             },
           },
           {
             managerName: {
-              contains: search,
+              contains: search.trim(),
             },
           },
         ],
       }),
     };
+
+    // =====================================================
+    // QUERY
+    // =====================================================
 
     const [warehouses, total] = await Promise.all([
       Prisma.warehouse.findMany({
@@ -275,7 +296,7 @@ class WarehouseServices {
         },
 
         skip,
-        take: limit,
+        take: limitNumber,
       }),
 
       Prisma.warehouse.count({
@@ -283,14 +304,18 @@ class WarehouseServices {
       }),
     ]);
 
+    // =====================================================
+    // RESPONSE
+    // =====================================================
+
     return {
-      data: warehouses,
+      warehouses,
 
       pagination: {
-        page,
-        limit,
+        page: pageNumber,
+        limit: limitNumber,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / limitNumber),
       },
     };
   }
