@@ -22,6 +22,7 @@ import purchaseItemRoutes from './purchase-item.route.js';
 import purchaseReturnItems from './purchaseReturnItem.route.js';
 import customerRoutes from './customer.route.js';
 import permissionRoutes from './permission.route.js';
+import suppliersRoute from './supplier.route.js';
 
 const router = Router();
 
@@ -32,6 +33,7 @@ router.use('/tenants', tenantRoute);
 router.use('/categories', categoryRoute);
 router.use('/brands', brandRoute);
 router.use('/units', unitRoute);
+router.use('/suppliers', suppliersRoute);
 router.use('/products', productRoute);
 router.use('/warehouses', warehouseRoute);
 router.use('/warehouse-stocks', warehouseStockRoute);
