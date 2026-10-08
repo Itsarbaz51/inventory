@@ -7,6 +7,17 @@ export function formatDate(date) {
     }).format(new Date(date));
 }
 
+export function formatMoney(value) {
+    if (value === null || value === undefined || value === "") {
+        return "-";
+    }
+
+    return `₹${Number(value).toLocaleString("en-IN", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    })}`;
+}
+
 export
     function StatusBadge({ status }) {
     const active = status === "ACTIVE";

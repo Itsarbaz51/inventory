@@ -105,6 +105,12 @@ const menuGroups = [
         permission: PermissionsRegistry.SUPPLIER.VIEW,
       },
       {
+        label: "Purchase Items",
+        icon: ShoppingBag,
+        path: "/dashboard/purchase-items",
+        permission: PermissionsRegistry.PURCHASE.VIEW,
+      },
+      {
         label: "Purchases",
         icon: ShoppingBag,
         path: "/dashboard/purchases",

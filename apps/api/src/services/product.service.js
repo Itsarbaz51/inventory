@@ -228,7 +228,7 @@ class ProductServices {
       isActive,
     } = query;
 
-    const skip = (page - 1) * limit;
+    const skip = (Number(page) - 1) * Number(limit);
 
     const where = {
       tenantId,
@@ -285,7 +285,7 @@ class ProductServices {
         },
 
         skip,
-        take: limit,
+        take: Number(limit),
       }),
 
       Prisma.product.count({
