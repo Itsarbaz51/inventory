@@ -27,6 +27,10 @@ import LoadingState from "@/components/ui/LoadingState";
 import EmptyState from "@/components/ui/EmptyState";
 
 import { formatDate } from "@/lib/utils";
+import userService from "@/services/userApi";
+import tenantService from "@/services/tenantApi";
+import useToast from "@/hooks/useToast";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function ProfilePage() {
     // ==================================================
@@ -36,6 +40,38 @@ export default function ProfilePage() {
     const currentUser = useSelector((state) => state.auth?.user);
 
     const tenant = currentUser?.tenant;
+    const queryClient = useQueryClient();
+    const toast = useToast();
+
+    const updateUser = useMutation({
+        mutationFn: userService.updateMe,
+        onSuccess: async (response) => {
+            await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+            toast.success(response?.message || "Profile updated successfully", "Success");
+            setUserEditing(false);
+        },
+        onError: (error) => {
+            toast.error(
+                error?.response?.data?.message || "Unable to update profile.",
+                "Profile update failed",
+            );
+        },
+    });
+
+    const updateTenant = useMutation({
+        mutationFn: tenantService.updateCurrent,
+        onSuccess: async (response) => {
+            await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+            toast.success(response?.message || "Business updated successfully", "Success");
+            setTenantEditing(false);
+        },
+        onError: (error) => {
+            toast.error(
+                error?.response?.data?.message || "Unable to update business information.",
+                "Business update failed",
+            );
+        },
+    });
 
     // ==================================================
     // EDIT STATES
@@ -127,22 +163,11 @@ export default function ProfilePage() {
 
     const handleUserSubmit = async (e) => {
         e.preventDefault();
-
-        // ==================================================
-        // TODO: USER UPDATE API
-        // ==================================================
-
-        /*
-        await updateCurrentUser({
+        updateUser.mutate({
             name: userForm.name,
             email: userForm.email,
             phone: userForm.phone,
         });
-        */
-
-        console.log("TODO - Update User:", userForm);
-
-        setUserEditing(false);
     };
 
     // ==================================================
@@ -183,21 +208,7 @@ export default function ProfilePage() {
 
     const handleTenantSubmit = async (e) => {
         e.preventDefault();
-
-        // ==================================================
-        // TODO: TENANT UPDATE API
-        // ==================================================
-
-        /*
-        await updateTenant(currentUser.tenantId, tenantForm);
-        */
-
-        console.log("TODO - Update Tenant:", {
-            tenantId: currentUser?.tenantId,
-            ...tenantForm,
-        });
-
-        setTenantEditing(false);
+        updateTenant.mutate(tenantForm);
     };
 
     // ==================================================
@@ -324,6 +335,8 @@ export default function ProfilePage() {
                         <Button
                             type="submit"
                             leftIcon={<Save size={16} />}
+                            loading={updateUser.isPending}
+                            disabled={updateUser.isPending}
                         >
                             Save Changes
                         </Button>
@@ -580,6 +593,8 @@ export default function ProfilePage() {
                         <Button
                             type="submit"
                             leftIcon={<Save size={16} />}
+                            loading={updateTenant.isPending}
+                            disabled={updateTenant.isPending}
                         >
                             Save Business
                         </Button>

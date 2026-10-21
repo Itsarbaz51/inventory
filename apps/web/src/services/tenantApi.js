@@ -35,6 +35,11 @@ const tenantService = {
         return response.data;
     },
 
+    updateCurrent: async (payload) => {
+        const response = await api.patch('/tenants/current', payload);
+        return response.data;
+    },
+
     delete: async (id) => {
         const response = await api.delete(`/tenants/${id}`);
         return response.data;

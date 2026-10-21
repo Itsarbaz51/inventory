@@ -36,6 +36,13 @@ router.get(
   PaymentController.getAll,
 );
 
+// GET REPORT SUMMARY
+router.get(
+  '/report',
+  ValidateRequest.validate(PaymentValidationSchemas.getAll),
+  PaymentController.getReport,
+);
+
 // =====================================================
 // GET BY ID
 // GET /api/payments/:id

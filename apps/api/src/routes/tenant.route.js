@@ -11,6 +11,15 @@ import { PermissionsRegistry } from '../utils/PermissionsRegistry.js';
 
 const route = Router();
 
+// UPDATE CURRENT TENANT PROFILE
+// This must stay before /:id so "current" is not treated as a UUID.
+route.patch(
+  '/current',
+  AuthMiddleware.isAuthenticated,
+  ValidateRequest.validate(TenantValidationSchemas.update),
+  asyncHandler(TenantController.update),
+);
+
 // =====================================================
 // CREATE TENANT
 // =====================================================

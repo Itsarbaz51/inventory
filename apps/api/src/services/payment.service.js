@@ -230,7 +230,7 @@ class PaymentService {
       limit = 10,
     } = query;
 
-    const skip = (page - 1) * limit;
+    const skip = (Number(page) - 1) * Number(limit);
 
     const where = {
       tenantId,
@@ -289,7 +289,7 @@ class PaymentService {
         where,
 
         skip,
-        take: limit,
+        take: Number(limit),
 
         orderBy: {
           paymentDate: 'desc',
@@ -349,6 +349,88 @@ class PaymentService {
         limit,
         total,
         totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  // =====================================================
+  // REPORT SUMMARY
+  // =====================================================
+
+  async getReport(query, tenantId) {
+    const { fromDate, toDate } = query;
+    const dateRange = {};
+
+    if (fromDate) dateRange.gte = fromDate;
+    if (toDate) {
+      const endDate = new Date(toDate);
+      endDate.setHours(23, 59, 59, 999);
+      dateRange.lte = endDate;
+    }
+
+    const hasDateRange = Object.keys(dateRange).length > 0;
+    const salesWhere = { tenantId, ...(hasDateRange ? { saleDate: dateRange } : {}) };
+    const purchasesWhere = { tenantId, ...(hasDateRange ? { purchaseDate: dateRange } : {}) };
+    const paymentsWhere = { tenantId, ...(hasDateRange ? { paymentDate: dateRange } : {}) };
+    const returnsWhere = { tenantId, ...(hasDateRange ? { returnDate: dateRange } : {}) };
+
+    const [sales, purchases, payments, salesReturns, purchaseReturns] =
+      await Promise.all([
+        Prisma.sale.aggregate({
+          where: salesWhere,
+          _count: { _all: true },
+          _sum: { grandTotal: true, paidAmount: true, dueAmount: true },
+        }),
+        Prisma.purchase.aggregate({
+          where: purchasesWhere,
+          _count: { _all: true },
+          _sum: { grandTotal: true, paidAmount: true, dueAmount: true },
+        }),
+        Prisma.payment.aggregate({
+          where: paymentsWhere,
+          _count: { _all: true },
+          _sum: { amount: true },
+        }),
+        Prisma.salesReturn.aggregate({
+          where: returnsWhere,
+          _count: { _all: true },
+          _sum: { totalAmount: true },
+        }),
+        Prisma.purchaseReturn.aggregate({
+          where: returnsWhere,
+          _count: { _all: true },
+          _sum: { totalAmount: true },
+        }),
+      ]);
+
+    const number = (value) => Number(value || 0);
+
+    return {
+      period: {
+        fromDate: fromDate || null,
+        toDate: toDate || null,
+      },
+      sales: {
+        count: sales._count._all,
+        total: number(sales._sum.grandTotal),
+        paid: number(sales._sum.paidAmount),
+        due: number(sales._sum.dueAmount),
+      },
+      purchases: {
+        count: purchases._count._all,
+        total: number(purchases._sum.grandTotal),
+        paid: number(purchases._sum.paidAmount),
+        due: number(purchases._sum.dueAmount),
+      },
+      payments: {
+        count: payments._count._all,
+        total: number(payments._sum.amount),
+      },
+      returns: {
+        salesCount: salesReturns._count._all,
+        salesTotal: number(salesReturns._sum.totalAmount),
+        purchasesCount: purchaseReturns._count._all,
+        purchasesTotal: number(purchaseReturns._sum.totalAmount),
       },
     };
   }

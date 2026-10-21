@@ -25,6 +25,15 @@ class UserController {
       .json(ApiResponse.success(updated, 'User updated successfully'));
   }
 
+  // UPDATE CURRENT USER PROFILE
+  static async updateMe(req, res) {
+    const updated = await UserServices.update({ id: req.user.id }, req);
+
+    return res
+      .status(200)
+      .json(ApiResponse.success(updated, 'Profile updated successfully'));
+  }
+
   // =====================================================
   // GET BY ID
   // =====================================================

@@ -31,6 +31,12 @@ const userService = {
     return response.data;
   },
 
+  updateMe: async (payload) => {
+    const response = await api.patch('/users/me', payload);
+
+    return response.data;
+  },
+
   // DELETE
   delete: async (id) => {
     const response = await api.delete(`/users/${id}`);

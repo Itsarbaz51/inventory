@@ -77,6 +77,28 @@ class PaymentController {
   }
 
   // =====================================================
+  // REPORT SUMMARY
+  // =====================================================
+
+  async getReport(req, res) {
+    try {
+      const tenantId = req.user.tenantId;
+      const report = await PaymentService.getReport(req.query, tenantId);
+
+      return res.status(200).json({
+        success: true,
+        message: 'Report fetched successfully',
+        data: report,
+      });
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+  }
+
+  // =====================================================
   // DELETE
   // =====================================================
 

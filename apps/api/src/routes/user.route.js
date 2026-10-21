@@ -10,6 +10,15 @@ import { PermissionsRegistry } from '../utils/PermissionsRegistry.js';
 
 const route = Router();
 
+// UPDATE CURRENT USER PROFILE
+// This must stay before /:id so "me" is not treated as a UUID.
+route.patch(
+  '/me',
+  AuthMiddleware.isAuthenticated,
+  ValidateRequest.validate(UserValidationSchemas.update),
+  asyncHandler(UserController.updateMe),
+);
+
 // CREATE USER
 
 route.post(
