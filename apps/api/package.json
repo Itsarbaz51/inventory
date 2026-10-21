@@ -2,12 +2,13 @@
   "name": "api",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "seed:user": " node prisma/user.seed.js",
-    "seed:permission": " node prisma/permission.seed.js"
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "build": "prisma generate",
+    "seed:user": "node prisma/user.seed.js",
+    "seed:permission": "node prisma/permission.seed.js"
   },
   "keywords": [],
   "author": "",
