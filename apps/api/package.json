@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "build": "prisma generate",
+    "db:generate": "prisma generate --schema=prisma/schema.prisma",
+    "build": "npm run db:generate",
     "seed:user": "node prisma/user.seed.js",
     "seed:permission": "node prisma/permission.seed.js"
   },
