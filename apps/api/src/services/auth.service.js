@@ -3,7 +3,7 @@ import Prisma from '../database/db.js';
 import CryptoService from '../utils/crypto.utils.js';
 import { generateAccessToken, generateRefreshToken } from '../utils/jwt.js';
 import { envConfig } from '../config/index.js';
-import { emailQueue } from '../queues/email.queue.js';
+// import { emailQueue } from '../queues/email.queue.js';
 import crypto from 'node:crypto';
 
 class AuthServices {
@@ -258,24 +258,24 @@ class AuthServices {
     // Email Queue
     // -----------------------------------------------
 
-    await emailQueue.add(
-      'forgot-password',
-      {
-        email: user.email,
-        name: user.name,
-        forgotUrl,
-      },
-      {
-        attempts: 3,
+    // await emailQueue.add(
+    //   'forgot-password',
+    //   {
+    //     email: user.email,
+    //     name: user.name,
+    //     forgotUrl,
+    //   },
+    //   {
+    //     attempts: 3,
 
-        backoff: {
-          type: 'exponential',
-          delay: 5000,
-        },
+    //     backoff: {
+    //       type: 'exponential',
+    //       delay: 5000,
+    //     },
 
-        removeOnComplete: true,
-      },
-    );
+    //     removeOnComplete: true,
+    //   },
+    // );
 
     return true;
   }
