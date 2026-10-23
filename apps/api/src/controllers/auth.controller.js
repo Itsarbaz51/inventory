@@ -69,6 +69,10 @@ class AuthController {
   // =====================================================
 
   static async me(req, res) {
+    console.log('Cookies received:', {
+      accessToken: Boolean(req.cookies?.accessToken),
+      refreshToken: Boolean(req.cookies?.refreshToken),
+    });
     const user = await AuthServices.me(req.user.id);
 
     return res.json(ApiResponse.success(user, 'Current user fetched'));
