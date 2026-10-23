@@ -23,26 +23,15 @@ class AuthController {
 
     return res
       .status(200)
-
       .cookie('accessToken', accessToken, {
         ...cookieOptions,
         maxAge: 15 * 60 * 1000,
       })
-
       .cookie('refreshToken', refreshToken, {
         ...cookieOptions,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       })
-
-      .json(
-        ApiResponse.success(
-          {
-            user: safeUser,
-            accessToken,
-          },
-          'Login successful',
-        ),
-      );
+      .json(ApiResponse.success({ user: safeUser }, 'Login successful'));
   }
 
   // =====================================================
