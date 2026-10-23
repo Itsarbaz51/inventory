@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server";
 
-export function proxy(request) {
-  const token = request.cookies.get("accessToken")?.value;
-  console.log(token);
-  console.log(request.nextUrl);
-
+export function middleware(request) {
   const { pathname } = request.nextUrl;
 
+  const token = request.cookies.get("accessToken")?.value;
+
+  console.log("middleware pathname:", pathname);
+  console.log("Access token exists:", !!token);
+
+  // If logged in, redirect away from login
   if (pathname === "/login" && token) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
+  // If not logged in, protect dashboard routes
   if (pathname.startsWith("/dashboard") && !token) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
