@@ -3,13 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import {
-  Mail,
-  Lock,
-  Eye,
-  EyeOff,
-  AlertCircle,
-} from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react";
 
 import Button from "@/components/ui/Button";
 import InputField from "@/components/ui/InputField";
@@ -76,12 +70,14 @@ function LoginForm() {
         password: formData.password,
       },
       {
-        onSuccess: () => {
+        onSuccess: (res) => {
           queryClient.invalidateQueries({
             queryKey: ["currentUser"],
           });
 
-          router.replace("/dashboard");
+          console.log(res);
+
+          router.push("/dashboard");
         },
 
         onError: (error) => {
@@ -98,10 +94,7 @@ function LoginForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-5"
-    >
+    <form onSubmit={handleSubmit} className="space-y-5">
       {/* General Error */}
 
       {errors.general && (
@@ -115,10 +108,7 @@ function LoginForm() {
             text-sm text-destructive
           "
         >
-          <AlertCircle
-            size={17}
-            className="mt-0.5 shrink-0"
-          />
+          <AlertCircle size={17} className="mt-0.5 shrink-0" />
 
           <span>{errors.general}</span>
         </div>
@@ -150,16 +140,8 @@ function LoginForm() {
         onChange={handleChange}
         error={errors.password}
         leftIcon={<Lock size={18} />}
-        rightIcon={
-          showPassword ? (
-            <EyeOff size={18} />
-          ) : (
-            <Eye size={18} />
-          )
-        }
-        onRightIconClick={() =>
-          setShowPassword((prev) => !prev)
-        }
+        rightIcon={showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+        onRightIconClick={() => setShowPassword((prev) => !prev)}
         required
         disabled={login.isPending}
       />

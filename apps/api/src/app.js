@@ -9,10 +9,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'https://inventory.axentralabs.in',
+    origin: ['https://inventory.axentralabs.in', 'http://localhost:3000'],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    // methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    // allowedHeaders: ['Content-Type', 'Authorization'],
   }),
 );
 
