@@ -12,6 +12,7 @@ export const envConfig = {
   DATABASE_USER: process.env.DATABASE_USER || 'root',
   DATABASE_PASSWORD: process.env.DATABASE_PASSWORD || '',
   DATABASE_NAME: process.env.DATABASE_NAME || 'mydb',
+  DATABASE_PORT: process.env.DATABASE_PORT || 3306,
 
   ACCESS_TOKEN_EXPIRES_IN: process.env.ACCESS_TOKEN_EXPIRES_IN || '1d',
   REFRESH_TOKEN_EXPIRES_IN: process.env.REFRESH_TOKEN_EXPIRES_IN || '7d',
