@@ -77,7 +77,7 @@ function LoginForm() {
 
           console.log(res);
 
-          router.push("/dashboard");
+          router.push("dashboard");
         },
 
         onError: (error) => {
